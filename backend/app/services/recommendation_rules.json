@@ -1,0 +1,356 @@
+{
+  "_disclaimer": "AI-generated guidance is for informational purposes. For severe crop damage or uncertain diagnosis, consult a qualified agricultural expert.",
+  "_default": {
+    "description": "No specific guidance is configured yet for this disease class.",
+    "treatment": "Consult a local agricultural extension officer for a confirmed diagnosis and treatment plan.",
+    "fertilizer": "Follow soil-test-based fertilizer recommendations for this crop; avoid excess nitrogen during active disease pressure.",
+    "pesticide_guidance": "Do not apply pesticides without confirming the diagnosis with an expert; misapplication can harm the crop and the environment.",
+    "prevention": "Practice crop rotation, use certified disease-free seed/seedlings, and avoid overhead irrigation that keeps foliage wet.",
+    "crop_management": "Remove and destroy visibly infected plant debris; avoid working in the field when foliage is wet.",
+    "monitoring_advice": "Inspect plants every 3-5 days, focusing on lower and older leaves where fungal disease often starts."
+  },
+  "diseases": {
+    "Apple___healthy": {
+      "description": "No disease detected. The apple leaf appears healthy.",
+      "treatment": "No treatment needed.",
+      "fertilizer": "Maintain a balanced NPK schedule appropriate for the current growth stage.",
+      "pesticide_guidance": "No pesticide action required.",
+      "prevention": "Continue routine monitoring and good field hygiene.",
+      "crop_management": "Maintain consistent watering, adequate spacing, and good airflow around plants.",
+      "monitoring_advice": "Re-check weekly, especially after rain or humid weather."
+    },
+    "Blueberry___healthy": {
+      "description": "No disease detected. The blueberry leaf appears healthy.",
+      "treatment": "No treatment needed.",
+      "fertilizer": "Maintain a balanced NPK schedule appropriate for the current growth stage.",
+      "pesticide_guidance": "No pesticide action required.",
+      "prevention": "Continue routine monitoring and good field hygiene.",
+      "crop_management": "Maintain consistent watering, adequate spacing, and good airflow around plants.",
+      "monitoring_advice": "Re-check weekly, especially after rain or humid weather."
+    },
+    "Cherry_(including_sour)___healthy": {
+      "description": "No disease detected. The cherry leaf appears healthy.",
+      "treatment": "No treatment needed.",
+      "fertilizer": "Maintain a balanced NPK schedule appropriate for the current growth stage.",
+      "pesticide_guidance": "No pesticide action required.",
+      "prevention": "Continue routine monitoring and good field hygiene.",
+      "crop_management": "Maintain consistent watering, adequate spacing, and good airflow around plants.",
+      "monitoring_advice": "Re-check weekly, especially after rain or humid weather."
+    },
+    "Corn_(maize)___healthy": {
+      "description": "No disease detected. The corn leaf appears healthy.",
+      "treatment": "No treatment needed.",
+      "fertilizer": "Maintain a balanced NPK schedule appropriate for the current growth stage.",
+      "pesticide_guidance": "No pesticide action required.",
+      "prevention": "Continue routine monitoring and good field hygiene.",
+      "crop_management": "Maintain consistent watering, adequate spacing, and good airflow around plants.",
+      "monitoring_advice": "Re-check weekly, especially after rain or humid weather."
+    },
+    "Grape___healthy": {
+      "description": "No disease detected. The grape leaf appears healthy.",
+      "treatment": "No treatment needed.",
+      "fertilizer": "Maintain a balanced NPK schedule appropriate for the current growth stage.",
+      "pesticide_guidance": "No pesticide action required.",
+      "prevention": "Continue routine monitoring and good field hygiene.",
+      "crop_management": "Maintain consistent watering, adequate spacing, and good airflow around plants.",
+      "monitoring_advice": "Re-check weekly, especially after rain or humid weather."
+    },
+    "Peach___healthy": {
+      "description": "No disease detected. The peach leaf appears healthy.",
+      "treatment": "No treatment needed.",
+      "fertilizer": "Maintain a balanced NPK schedule appropriate for the current growth stage.",
+      "pesticide_guidance": "No pesticide action required.",
+      "prevention": "Continue routine monitoring and good field hygiene.",
+      "crop_management": "Maintain consistent watering, adequate spacing, and good airflow around plants.",
+      "monitoring_advice": "Re-check weekly, especially after rain or humid weather."
+    },
+    "Pepper,_bell___healthy": {
+      "description": "No disease detected. The pepper bell leaf appears healthy.",
+      "treatment": "No treatment needed.",
+      "fertilizer": "Maintain a balanced NPK schedule appropriate for the current growth stage.",
+      "pesticide_guidance": "No pesticide action required.",
+      "prevention": "Continue routine monitoring and good field hygiene.",
+      "crop_management": "Maintain consistent watering, adequate spacing, and good airflow around plants.",
+      "monitoring_advice": "Re-check weekly, especially after rain or humid weather."
+    },
+    "Potato___healthy": {
+      "description": "No disease detected. The potato leaf appears healthy.",
+      "treatment": "No treatment needed.",
+      "fertilizer": "Maintain a balanced NPK schedule appropriate for the current growth stage.",
+      "pesticide_guidance": "No pesticide action required.",
+      "prevention": "Continue routine monitoring and good field hygiene.",
+      "crop_management": "Maintain consistent watering, adequate spacing, and good airflow around plants.",
+      "monitoring_advice": "Re-check weekly, especially after rain or humid weather."
+    },
+    "Raspberry___healthy": {
+      "description": "No disease detected. The raspberry leaf appears healthy.",
+      "treatment": "No treatment needed.",
+      "fertilizer": "Maintain a balanced NPK schedule appropriate for the current growth stage.",
+      "pesticide_guidance": "No pesticide action required.",
+      "prevention": "Continue routine monitoring and good field hygiene.",
+      "crop_management": "Maintain consistent watering, adequate spacing, and good airflow around plants.",
+      "monitoring_advice": "Re-check weekly, especially after rain or humid weather."
+    },
+    "Soybean___healthy": {
+      "description": "No disease detected. The soybean leaf appears healthy.",
+      "treatment": "No treatment needed.",
+      "fertilizer": "Maintain a balanced NPK schedule appropriate for the current growth stage.",
+      "pesticide_guidance": "No pesticide action required.",
+      "prevention": "Continue routine monitoring and good field hygiene.",
+      "crop_management": "Maintain consistent watering, adequate spacing, and good airflow around plants.",
+      "monitoring_advice": "Re-check weekly, especially after rain or humid weather."
+    },
+    "Strawberry___healthy": {
+      "description": "No disease detected. The strawberry leaf appears healthy.",
+      "treatment": "No treatment needed.",
+      "fertilizer": "Maintain a balanced NPK schedule appropriate for the current growth stage.",
+      "pesticide_guidance": "No pesticide action required.",
+      "prevention": "Continue routine monitoring and good field hygiene.",
+      "crop_management": "Maintain consistent watering, adequate spacing, and good airflow around plants.",
+      "monitoring_advice": "Re-check weekly, especially after rain or humid weather."
+    },
+    "Tomato___healthy": {
+      "description": "No disease detected. The tomato leaf appears healthy.",
+      "treatment": "No treatment needed.",
+      "fertilizer": "Maintain a balanced NPK schedule appropriate for the current growth stage.",
+      "pesticide_guidance": "No pesticide action required.",
+      "prevention": "Continue routine monitoring and good field hygiene.",
+      "crop_management": "Maintain consistent watering, adequate spacing, and good airflow around plants.",
+      "monitoring_advice": "Re-check weekly, especially after rain or humid weather."
+    },
+    "Apple___Apple_scab": {
+      "description": "Apple scab is a fungal disease (Venturia inaequalis) causing olive-green to black velvety spots on leaves and fruit, often leading to early leaf drop.",
+      "treatment": "Remove and destroy fallen infected leaves at season's end to reduce next year's spore source; prune for better airflow.",
+      "fertilizer": "Avoid excess nitrogen, which promotes dense, humid foliage favorable to scab.",
+      "pesticide_guidance": "Preventive fungicide programs (e.g. captan or sulfur-based, where locally approved) are commonly used starting at bud break; follow local label directions.",
+      "prevention": "Choose scab-resistant apple varieties where possible; avoid overhead irrigation.",
+      "crop_management": "Prune to open the canopy for sunlight and airflow, which speeds leaf drying after rain.",
+      "monitoring_advice": "Inspect new leaves and fruit weekly during wet spring weather, when scab spreads fastest."
+    },
+    "Apple___Black_rot": {
+      "description": "Black rot (Botryosphaeria obtusa) causes purple-bordered leaf spots and can rot fruit and cankers on branches.",
+      "treatment": "Prune out dead wood and cankers; remove mummified fruit left on the tree or ground, which harbor the fungus.",
+      "fertilizer": "Maintain balanced tree nutrition; avoid stressing the tree, which increases susceptibility.",
+      "pesticide_guidance": "Fungicide programs used for apple scab often also help manage black rot; consult local guidance for timing.",
+      "prevention": "Remove nearby dead or infected wood promptly; avoid wounding bark during maintenance.",
+      "crop_management": "Ensure good pruning practices for airflow and sunlight penetration.",
+      "monitoring_advice": "Check branches and fruit regularly, especially after storm damage that creates entry wounds."
+    },
+    "Apple___Cedar_apple_rust": {
+      "description": "Cedar apple rust (Gymnosporangium juniperi-virginianae) causes bright orange-yellow spots on leaves; it requires both apple and a nearby juniper/cedar host to complete its life cycle.",
+      "treatment": "Remove nearby juniper/cedar hosts within a few hundred meters if feasible, as they harbor the overwintering stage.",
+      "fertilizer": "Maintain balanced nutrition; this disease is not fertilizer-related.",
+      "pesticide_guidance": "Preventive fungicide applications in spring (where locally approved) can reduce infection during the spore-release period.",
+      "prevention": "Plant rust-resistant apple varieties where cedar/juniper hosts are common nearby.",
+      "crop_management": "Monitor nearby juniper plants for the orange gelatinous galls that release spores in spring.",
+      "monitoring_advice": "Check leaves in spring, especially after rain, when spores are released from nearby junipers."
+    },
+    "Cherry_(including_sour)___Powdery_mildew": {
+      "description": "Powdery mildew appears as white, powdery fungal growth on leaves and shoots, thriving in warm, dry conditions with high humidity at night.",
+      "treatment": "Prune out heavily infected shoots; improve airflow through the canopy.",
+      "fertilizer": "Avoid excess nitrogen, which encourages the succulent new growth mildew prefers.",
+      "pesticide_guidance": "Sulfur-based or other locally approved fungicides are commonly used against powdery mildew; follow label directions.",
+      "prevention": "Space and prune trees for airflow; avoid overhead irrigation in the evening.",
+      "crop_management": "Remove water sprouts and dense inner growth during dormant pruning.",
+      "monitoring_advice": "Check new shoot tips weekly in warm weather, where mildew often starts."
+    },
+    "Corn_(maize)___Common_rust_": {
+      "description": "Common rust (Puccinia sorghi) produces small, reddish-brown pustules on both leaf surfaces; it's usually less damaging than southern rust but can reduce yield in heavy infections.",
+      "treatment": "Most common corn hybrids tolerate common rust well; treatment is rarely needed unless infection is severe and early.",
+      "fertilizer": "Maintain balanced nutrition to support plant vigor.",
+      "pesticide_guidance": "Fungicide is rarely justified for common rust alone; consult a local expert if pustule density is very high on young plants.",
+      "prevention": "Most modern hybrids have adequate resistance; select resistant varieties in high-pressure areas.",
+      "crop_management": "No special management typically needed beyond routine monitoring.",
+      "monitoring_advice": "Scout periodically; heavy pustule coverage on upper leaves before tasseling is the main concern."
+    },
+    "Corn_(maize)___Northern_Leaf_Blight": {
+      "description": "Northern leaf blight (Exserohilum turcicum) causes long, elliptical gray-green to tan lesions on leaves, which can merge and cause significant leaf loss in humid conditions.",
+      "treatment": "Remove or bury infected residue after harvest to limit carryover to the next season.",
+      "fertilizer": "Maintain balanced nitrogen; nutrient-stressed plants show more severe symptoms.",
+      "pesticide_guidance": "Foliar fungicides may be warranted in susceptible hybrids under high disease pressure; consult local extension timing guidance.",
+      "prevention": "Choose resistant hybrids; rotate away from continuous corn where feasible.",
+      "crop_management": "Reduce residue buildup and consider tillage practices that speed residue breakdown in high-risk fields.",
+      "monitoring_advice": "Scout weekly from mid-vegetative stage onward, especially in humid, overcast weather."
+    },
+    "Grape___Black_rot": {
+      "description": "Black rot (Guignardia bidwellii) causes reddish-brown leaf spots and can mummify grape berries; it thrives in warm, wet conditions.",
+      "treatment": "Remove mummified berries and infected leaves/canes, which are the main source of spores for the next season.",
+      "fertilizer": "Maintain balanced vine nutrition; avoid excess vigor that reduces airflow.",
+      "pesticide_guidance": "Preventive fungicide programs from early shoot growth through fruit set (where locally approved) are commonly used.",
+      "prevention": "Prune for an open canopy; remove wild/abandoned grapevines nearby that can harbor the fungus.",
+      "crop_management": "Practice canopy management (shoot thinning, leaf pulling) to improve sunlight and airflow.",
+      "monitoring_advice": "Inspect leaves and clusters weekly during wet spring weather."
+    },
+    "Grape___Esca_(Black_Measles)": {
+      "description": "Esca (a complex of wood-rotting fungi) causes tiger-stripe leaf discoloration and can lead to vine decline over years; it's associated with pruning wounds and older wood.",
+      "treatment": "There is no cure once wood is infected; remove and destroy severely affected vines/wood, and avoid pruning in wet weather.",
+      "fertilizer": "Maintain balanced vine nutrition to support overall vine health and resilience.",
+      "pesticide_guidance": "No reliable curative fungicide exists for esca; management focuses on prevention. Consult a viticulture expert for severe cases.",
+      "prevention": "Protect pruning wounds, prune in dry weather, and avoid large pruning cuts on older wood where possible.",
+      "crop_management": "Consider retraining/replacing chronically affected vines over time.",
+      "monitoring_advice": "Watch for the characteristic tiger-stripe leaf pattern in mid-to-late summer, which often signals internal wood decay."
+    },
+    "Grape___Leaf_blight_(Isariopsis_Leaf_Spot)": {
+      "description": "Isariopsis leaf blight causes angular, dark brown spots on grape leaves, sometimes leading to premature defoliation in warm, humid climates.",
+      "treatment": "Remove and destroy heavily infected leaves; improve canopy airflow through pruning.",
+      "fertilizer": "Maintain balanced nutrition; avoid excess nitrogen that promotes dense canopy humidity.",
+      "pesticide_guidance": "Fungicide programs used for other grape leaf diseases often provide some control; consult local guidance.",
+      "prevention": "Prune for airflow; avoid working in wet canopies, which can spread spores.",
+      "crop_management": "Practice canopy management to reduce humidity within the vine.",
+      "monitoring_advice": "Check leaves regularly during warm, humid periods."
+    },
+    "Orange___Haunglongbing_(Citrus_greening)": {
+      "description": "Citrus greening (Huanglongbing / HLB) is a serious bacterial disease spread by the Asian citrus psyllid, causing blotchy mottled leaves, lopsided bitter fruit, and eventual tree decline. There is no cure.",
+      "treatment": "There is no cure for HLB. Infected trees should be reported to and removed under local agricultural authority guidance to slow regional spread.",
+      "fertilizer": "Enhanced nutritional programs are sometimes used to prolong productivity of infected trees, but they do not cure the disease \u2014 follow local extension guidance.",
+      "pesticide_guidance": "Psyllid vector control (insecticide programs targeting the Asian citrus psyllid) is the primary management tool; consult a local citrus extension program, as this is a regulated disease in many regions.",
+      "prevention": "Use certified disease-free nursery stock; control psyllid populations; remove confirmed infected trees promptly per local regulations.",
+      "crop_management": "This is a serious regulated disease \u2014 contact your local agricultural extension or plant health authority immediately if HLB is suspected.",
+      "monitoring_advice": "Inspect new flush growth regularly for blotchy mottling and monitor for psyllid activity."
+    },
+    "Peach___Bacterial_spot": {
+      "description": "Bacterial spot (Xanthomonas arboricola) causes small, dark, angular spots on leaves that may fall out leaving a 'shot-hole' look, and can also spot fruit.",
+      "treatment": "Remove and destroy heavily infected leaves and twigs; avoid working in wet orchards, which spreads bacteria.",
+      "fertilizer": "Avoid excess nitrogen, which promotes susceptible new growth.",
+      "pesticide_guidance": "Copper-based bactericides (where locally approved) applied preventively are commonly used; bacterial diseases do not respond to fungicides.",
+      "prevention": "Choose resistant peach varieties where available; avoid overhead irrigation.",
+      "crop_management": "Prune for airflow and avoid excessive nitrogen fertilization.",
+      "monitoring_advice": "Inspect leaves after wind-driven rain, which spreads the bacteria."
+    },
+    "Pepper,_bell___Bacterial_spot": {
+      "description": "Bacterial spot (Xanthomonas species) causes small, water-soaked, dark leaf spots that can merge, and scabby spots on fruit; it spreads rapidly in warm, wet, windy conditions.",
+      "treatment": "Remove and destroy infected plant debris; avoid overhead irrigation and working in wet plants.",
+      "fertilizer": "Maintain balanced nutrition; avoid excess nitrogen.",
+      "pesticide_guidance": "Copper-based bactericides (where locally approved) may reduce spread if applied early; bacterial diseases do not respond to fungicides.",
+      "prevention": "Use certified disease-free seed/transplants; rotate away from peppers/tomatoes for 1-2 seasons.",
+      "crop_management": "Space plants for airflow; avoid handling wet plants to reduce mechanical spread.",
+      "monitoring_advice": "Inspect leaves every few days during warm, wet, or windy weather."
+    },
+    "Potato___Early_blight": {
+      "description": "Early blight (Alternaria solani) causes dark, concentric-ringed 'target' spots on older leaves first, typically starting mid-season.",
+      "treatment": "Remove and destroy affected lower leaves; ensure adequate plant nutrition to support regrowth.",
+      "fertilizer": "Avoid nitrogen deficiency, which increases susceptibility; maintain balanced potassium levels.",
+      "pesticide_guidance": "Chlorothalonil or copper-based fungicides (where locally approved) are commonly used; follow local label directions and pre-harvest intervals.",
+      "prevention": "Rotate crops away from potato/tomato family for 2+ seasons; use certified disease-free seed potatoes.",
+      "crop_management": "Ensure adequate plant spacing and hilling for airflow.",
+      "monitoring_advice": "Check lower/older leaves every few days once symptoms are suspected; the disease moves upward over time."
+    },
+    "Potato___Late_blight": {
+      "description": "Late blight (Phytophthora infestans) causes water-soaked lesions that spread rapidly in cool, wet conditions and can destroy a crop within days \u2014 this is the pathogen behind historic potato famines.",
+      "treatment": "This disease spreads fast \u2014 remove and destroy infected plants promptly; do not compost infected material.",
+      "fertilizer": "Focus on plant recovery post-outbreak with balanced fertilization; avoid stimulating excess soft new growth mid-outbreak.",
+      "pesticide_guidance": "Late blight often requires prompt, expert-guided fungicide intervention (e.g. products containing mancozeb or chlorothalonil, where locally approved); consult a local expert given how fast this disease spreads.",
+      "prevention": "Use certified disease-free seed potatoes; avoid overhead irrigation; monitor weather for the cool, humid conditions that favor outbreaks.",
+      "crop_management": "Increase plant spacing and remove volunteer potato/tomato plants that can harbor the pathogen between seasons.",
+      "monitoring_advice": "Check daily during cool, wet weather \u2014 this disease can move from a few spots to total crop loss within a week."
+    },
+    "Squash___Powdery_mildew": {
+      "description": "Powdery mildew appears as white powdery patches on squash leaves and stems, common in warm, humid climates, and can reduce yield if severe.",
+      "treatment": "Remove heavily infected leaves; improve airflow by thinning dense foliage.",
+      "fertilizer": "Avoid excess nitrogen, which promotes dense, susceptible foliage.",
+      "pesticide_guidance": "Sulfur-based or potassium bicarbonate fungicides (where locally approved) are commonly used against powdery mildew.",
+      "prevention": "Choose resistant varieties where available; space plants for airflow.",
+      "crop_management": "Water at the base of plants rather than overhead; avoid overcrowding.",
+      "monitoring_advice": "Check the undersides of leaves weekly, especially in warm, humid weather."
+    },
+    "Strawberry___Leaf_scorch": {
+      "description": "Leaf scorch (Diplocarpon earlianum) causes small purple spots that merge into larger scorched-looking blotches on strawberry leaves.",
+      "treatment": "Remove and destroy infected leaves after harvest (a common renovation practice); avoid overhead irrigation.",
+      "fertilizer": "Maintain balanced nutrition; avoid excess nitrogen that promotes dense, humid foliage.",
+      "pesticide_guidance": "Fungicide programs (where locally approved) may help in high-pressure plantings; consult local guidance on timing.",
+      "prevention": "Use disease-free transplants; renovate beds (mow and remove old leaves) after harvest each year.",
+      "crop_management": "Space plants for airflow and avoid working in wet foliage.",
+      "monitoring_advice": "Inspect leaves regularly through the growing season, especially after rain."
+    },
+    "Tomato___Bacterial_spot": {
+      "description": "Bacterial spot (Xanthomonas species) causes small, dark, water-soaked leaf spots and scabby fruit lesions; it spreads rapidly in warm, wet, windy conditions.",
+      "treatment": "Remove and destroy infected plant debris; avoid overhead irrigation and handling wet plants.",
+      "fertilizer": "Maintain balanced nutrition; avoid excess nitrogen.",
+      "pesticide_guidance": "Copper-based bactericides (where locally approved) may reduce spread if applied early; this is a bacterial disease and does not respond to fungicides.",
+      "prevention": "Use certified disease-free seed/transplants; rotate away from tomatoes/peppers for 1-2 seasons.",
+      "crop_management": "Space plants for airflow; stake to keep foliage off the ground.",
+      "monitoring_advice": "Inspect leaves every few days during warm, wet, or windy weather."
+    },
+    "Tomato___Early_blight": {
+      "description": "Early blight is a fungal disease (Alternaria solani) causing dark concentric-ringed spots on older leaves first.",
+      "treatment": "Remove and destroy affected lower leaves; improve airflow via pruning and spacing.",
+      "fertilizer": "Avoid excess nitrogen, which promotes dense foliage and humidity around leaves; ensure adequate potassium.",
+      "pesticide_guidance": "Copper-based or chlorothalonil-based fungicides are commonly used against early blight; follow local label directions and pre-harvest intervals.",
+      "prevention": "Rotate crops away from tomato/potato family for 2+ seasons; use disease-free transplants; mulch to reduce soil splash onto leaves.",
+      "crop_management": "Stake or cage plants to keep foliage off the ground; water at the base, not overhead.",
+      "monitoring_advice": "Check lower leaves every 3-4 days once symptoms are suspected; blight spreads upward over time."
+    },
+    "Tomato___Late_blight": {
+      "description": "Late blight (Phytophthora infestans) causes water-soaked lesions that spread rapidly in cool, wet conditions and can destroy a crop within days.",
+      "treatment": "This disease spreads fast \u2014 remove and destroy infected plants promptly; do not compost infected material.",
+      "fertilizer": "Focus on plant recovery once the outbreak is controlled; avoid stimulating excess soft new growth mid-outbreak.",
+      "pesticide_guidance": "Late blight often requires prompt, expert-guided fungicide intervention (e.g. products containing mancozeb or chlorothalonil, where locally approved); consult a local expert given how fast this disease spreads.",
+      "prevention": "Use certified disease-free seed/transplants; avoid overhead irrigation; monitor weather for the cool, humid conditions that favor outbreaks.",
+      "crop_management": "Increase plant spacing and remove volunteer potato/tomato plants that can harbor the pathogen between seasons.",
+      "monitoring_advice": "Check daily during cool, wet weather \u2014 this disease can move from a few spots to total crop loss within a week."
+    },
+    "Tomato___Leaf_Mold": {
+      "description": "Leaf mold (Passalora fulva) causes pale green-to-yellow spots on upper leaf surfaces with an olive-green to grayish-purple fuzzy mold underneath; it's especially common in humid greenhouse conditions.",
+      "treatment": "Remove and destroy infected leaves; increase ventilation to lower humidity around plants.",
+      "fertilizer": "Maintain balanced nutrition; this disease is driven mainly by humidity, not fertility.",
+      "pesticide_guidance": "Fungicides (where locally approved) can help in persistent cases; improving ventilation is usually the priority for greenhouse growers.",
+      "prevention": "Choose resistant varieties where available; avoid overhead watering and overcrowding.",
+      "crop_management": "Improve airflow (ventilation, plant spacing, pruning lower leaves) to reduce humidity around foliage.",
+      "monitoring_advice": "Check leaf undersides weekly, especially in humid or poorly ventilated growing spaces."
+    },
+    "Tomato___Septoria_leaf_spot": {
+      "description": "Septoria leaf spot (Septoria lycopersici) causes small, circular spots with dark borders and light centers, usually starting on lower leaves and spreading upward.",
+      "treatment": "Remove and destroy infected lower leaves promptly; avoid overhead watering.",
+      "fertilizer": "Maintain balanced nutrition to support plant vigor and recovery.",
+      "pesticide_guidance": "Chlorothalonil or copper-based fungicides (where locally approved) are commonly used; follow local label directions.",
+      "prevention": "Rotate crops away from tomato family for 1-2 seasons; mulch to reduce soil splash onto lower leaves.",
+      "crop_management": "Stake plants and remove lower leaves that touch the soil.",
+      "monitoring_advice": "Check lower leaves every few days, especially after rain \u2014 this disease spreads upward quickly."
+    },
+    "Tomato___Spider_mites Two-spotted_spider_mite": {
+      "description": "Two-spotted spider mites are tiny pests (not a disease) causing stippled, yellowing leaves and fine webbing, especially in hot, dry conditions.",
+      "treatment": "Rinse plants with a strong water spray to dislodge mites; remove heavily infested leaves.",
+      "fertilizer": "Avoid excess nitrogen, which can increase mite reproduction on lush growth.",
+      "pesticide_guidance": "Insecticidal soap or horticultural oil (where locally approved) can help; avoid broad-spectrum insecticides that also kill mite predators.",
+      "prevention": "Keep plants adequately watered \u2014 drought-stressed plants are more attractive to spider mites.",
+      "crop_management": "Encourage natural predators (e.g. predatory mites, ladybugs) by minimizing broad-spectrum pesticide use.",
+      "monitoring_advice": "Check the undersides of leaves for fine webbing and stippling, especially during hot, dry spells."
+    },
+    "Tomato___Target_Spot": {
+      "description": "Target spot (Corynespora cassiicola) causes brown lesions with concentric rings, resembling early blight, and can affect leaves, stems, and fruit in warm, humid conditions.",
+      "treatment": "Remove and destroy infected leaves; improve airflow around plants.",
+      "fertilizer": "Maintain balanced nutrition to support plant vigor.",
+      "pesticide_guidance": "Fungicides used for other tomato leaf spot diseases (where locally approved) often provide some control; consult local guidance.",
+      "prevention": "Rotate crops; avoid overhead irrigation; use disease-free transplants.",
+      "crop_management": "Stake plants and prune for airflow, avoiding dense, humid canopies.",
+      "monitoring_advice": "Check leaves and fruit regularly during warm, humid weather."
+    },
+    "Tomato___Tomato_Yellow_Leaf_Curl_Virus": {
+      "description": "Tomato Yellow Leaf Curl Virus (TYLCV) is spread by whiteflies and causes upward-curling, yellowing leaves and stunted growth; there is no cure once a plant is infected.",
+      "treatment": "There is no cure \u2014 remove and destroy infected plants to reduce the source of infection for whiteflies to spread further.",
+      "fertilizer": "Not fertilizer-related; focus fertility efforts on healthy remaining plants.",
+      "pesticide_guidance": "Manage the whitefly vector (insecticidal soap, reflective mulches, or approved insecticides) rather than the virus itself, which has no direct treatment.",
+      "prevention": "Use virus-resistant tomato varieties where available; control whitefly populations; use insect netting on young transplants.",
+      "crop_management": "Remove and destroy infected plants promptly rather than allowing them to remain as a whitefly source.",
+      "monitoring_advice": "Monitor for whitefly activity and early leaf curling/yellowing symptoms, especially in warm weather."
+    },
+    "Tomato___Tomato_mosaic_virus": {
+      "description": "Tomato mosaic virus (ToMV) causes mottled light/dark green mosaic patterns on leaves, sometimes with leaf curling and stunted growth; it spreads easily through contact, tools, and hands.",
+      "treatment": "There is no cure \u2014 remove and destroy infected plants. Wash hands and disinfect tools after handling infected plants before touching healthy ones.",
+      "fertilizer": "Not fertilizer-related; maintain balanced nutrition on remaining healthy plants.",
+      "pesticide_guidance": "Not applicable \u2014 this is a virus, not a pest or fungal issue; sanitation is the primary control.",
+      "prevention": "Use certified virus-free seed; avoid tobacco product use near plants (a known transmission route); disinfect tools between plants.",
+      "crop_management": "Avoid working with wet plants and disinfect hands/tools between handling different plants.",
+      "monitoring_advice": "Watch for mottled mosaic leaf patterns and isolate/remove suspect plants promptly."
+    },
+    "Corn_(maize)___Cercospora_leaf_spot Gray_leaf_spot": {
+      "description": "Gray leaf spot (Cercospora zeae-maydis) causes rectangular gray-to-tan lesions running parallel to leaf veins, most severe in warm, humid conditions with heavy crop residue.",
+      "treatment": "Remove or bury heavily infected crop residue after harvest to reduce the disease's overwintering source.",
+      "fertilizer": "Maintain balanced nitrogen; stressed, nutrient-deficient plants are more susceptible.",
+      "pesticide_guidance": "Foliar fungicides (e.g. strobilurin or triazole-based, where locally approved) may be warranted in high-risk fields; consult local extension guidance on timing.",
+      "prevention": "Rotate away from continuous corn where feasible; choose resistant hybrids.",
+      "crop_management": "Reduce plant density in high-risk fields to improve airflow and leaf drying.",
+      "monitoring_advice": "Scout fields weekly starting mid-season, focusing on lower leaves first."
+    }
+  }
+}
