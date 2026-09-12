@@ -51,3 +51,6 @@ logs/
 
 # PyTorch model
 ml/models/*.pt
+
+# TypeScript build cache
+*.tsbuildinfo

@@ -11,20 +11,26 @@ from app.core.security import decode_token
 from app.models.user import User
 from app.repositories.user_repository import get_user_by_id
 
-bearer_scheme = HTTPBearer()
+
+# Do not let HTTPBearer automatically return 403 when the header is missing.
+# We want our API to return 401 Unauthorized instead.
+bearer_scheme = HTTPBearer(auto_error=False)
 
 
 def get_current_user(
-    credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme),
+    credentials: HTTPAuthorizationCredentials | None = Depends(bearer_scheme),
     db: Session = Depends(get_db),
 ) -> User:
-    token = credentials.credentials
 
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
+
+    # No Authorization header
+    if credentials is None:
+        raise credentials_exception
 
     token = credentials.credentials
 
