@@ -10,7 +10,7 @@ interface Message {
 }
 
 const Chat: React.FC = () => {
-  const { locale } = useLanguage();
+  const { locale, t } = useLanguage();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [conversationId, setConversationId] = useState<string | undefined>(undefined);
@@ -20,7 +20,11 @@ const Chat: React.FC = () => {
   const voice = useVoice(locale);
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    // Older embedded browsers and test DOMs may not implement this optional
+    // browser convenience API. Chat must remain usable when it is absent.
+    if (typeof bottomRef.current?.scrollIntoView === "function") {
+      bottomRef.current.scrollIntoView({ behavior: "smooth" });
+    }
   }, [messages]);
 
   const handleSend = async (overrideText?: string) => {
@@ -31,13 +35,12 @@ const Chat: React.FC = () => {
     setInput("");
     setLoading(true);
     try {
-      const res = await sendChatMessage(userMessage.content, conversationId);
+      const res = await sendChatMessage(userMessage.content, conversationId, locale);
       setConversationId(res.data.conversation_id);
       setMessages((prev) => [...prev, { role: "assistant", content: res.data.reply, mode: res.data.mode }]);
       if (voiceReplies) voice.speak(res.data.reply);
     } catch {
-      const errMsg = "Sorry, something went wrong. Please try again.";
-      setMessages((prev) => [...prev, { role: "assistant", content: errMsg }]);
+      setMessages((prev) => [...prev, { role: "assistant", content: t("chat_error") }]);
     } finally {
       setLoading(false);
     }
@@ -54,42 +57,64 @@ const Chat: React.FC = () => {
     });
   };
 
+  const quickActions = [
+    { label: t("chat_quick_explain_diagnosis"), message: "Can you explain my most recent diagnosis?" },
+    { label: t("chat_quick_what_now"), message: "What should I do now based on my last diagnosis?" },
+    { label: t("chat_quick_organic"), message: "What organic treatment options are there for my last diagnosis?" },
+    { label: t("chat_quick_prevention"), message: "How can I prevent this disease in the future?" },
+    { label: t("chat_quick_weather"), message: "What's the weather like right now?" },
+    { label: t("chat_quick_report"), message: "Can you generate a report for my last diagnosis?" },
+  ];
+
   return (
-    <div className="max-w-2xl mx-auto p-6 flex flex-col h-[calc(100vh-140px)]">
+    <div className="max-w-2xl mx-auto p-4 md:p-6 flex flex-col h-[calc(100vh-248px)] md:h-[calc(100vh-112px)]">
       <div className="flex items-center justify-between mb-2">
-        <h1 className="text-2xl font-bold text-primary-700">GreenMind Assistant</h1>
+        <h1 className="text-2xl font-semibold text-earth-900">{t("chat_title")}</h1>
         {voice.supported && (
-          <label className="flex items-center gap-2 text-xs text-gray-500">
+          <label className="flex items-center gap-2 text-xs text-earth-500">
             <input type="checkbox" checked={voiceReplies} onChange={(e) => setVoiceReplies(e.target.checked)} />
-            Speak replies
+            {t("chat_speak_replies")}
           </label>
         )}
       </div>
-      <p className="text-xs text-gray-500 mb-4">
-        Provides general agricultural guidance and does not replace a qualified expert for severe or uncertain cases.
+      <p className="text-xs text-earth-500 mb-4">
+        {t("chat_disclaimer")}
       </p>
 
       {voice.error && (
-        <div className="bg-yellow-50 text-yellow-800 text-xs p-2 rounded mb-2 border border-yellow-200">
+        <div className="bg-accent-50 text-accent-700 text-xs p-2 rounded-md mb-2 border border-accent-100">
           {voice.error}
         </div>
       )}
 
-      <div className="flex-1 overflow-y-auto bg-white rounded-lg border shadow-sm p-4 space-y-3 mb-4">
+      <div className="flex-1 overflow-y-auto bg-white rounded-lg border border-earth-200 shadow-soft p-4 space-y-3 mb-4">
         {messages.length === 0 && (
-          <p className="text-gray-400 text-sm text-center mt-8">
-            Ask about crop diseases, symptoms, fertilizer, pests, or weather-related crop care.
-            {voice.supported && " Or tap the microphone to speak your question."}
-          </p>
+          <div className="mt-4">
+            <p className="text-earth-400 text-sm text-center mb-5">
+              {t("chat_empty_prompt")}
+              {voice.supported && ` ${t("chat_empty_prompt_voice")}`}
+            </p>
+            <div className="flex flex-wrap gap-2 justify-center">
+              {quickActions.map((action) => (
+                <button
+                  key={action.label}
+                  onClick={() => handleSend(action.message)}
+                  className="text-xs font-medium border border-earth-200 rounded-full px-3 py-1.5 text-earth-700 hover:bg-earth-50 hover:border-primary-300 transition-colors"
+                >
+                  {action.label}
+                </button>
+              ))}
+            </div>
+          </div>
         )}
         {messages.map((m, i) => (
           <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
             <div className={`max-w-[80%] rounded-lg px-4 py-2 text-sm ${
-              m.role === "user" ? "bg-primary-600 text-white" : "bg-gray-100 text-gray-800"
+              m.role === "user" ? "bg-primary-600 text-white" : "bg-earth-100 text-earth-800"
             }`}>
               {m.content}
               {m.mode === "rule_based_fallback" && (
-                <p className="text-[10px] opacity-70 mt-1">Basic Assistant Mode (no AI API key configured)</p>
+                <p className="text-[10px] opacity-70 mt-1">{t("chat_basic_mode_notice")}</p>
               )}
             </div>
           </div>
@@ -102,23 +127,23 @@ const Chat: React.FC = () => {
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && handleSend()}
-          placeholder="Ask GreenMind Assistant about crop diseases, fertilizer, pests..."
-          className="flex-1 border rounded px-3 py-2"
+          placeholder={t("chat_placeholder")}
+          className="flex-1 border border-earth-200 rounded-md px-3 py-2 bg-white"
         />
         {voice.supported && (
           <button
             onClick={handleMicClick}
-            title={voice.listening ? "Stop listening" : "Speak your question"}
-            className={`px-3 py-2 rounded font-medium border ${
-              voice.listening ? "bg-red-500 text-white border-red-500 animate-pulse" : "border-gray-300 hover:bg-gray-50"
+            title={voice.listening ? t("chat_mic_stop") : t("chat_mic_start")}
+            className={`px-3 py-2 rounded-md font-medium border ${
+              voice.listening ? "bg-danger-500 text-white border-danger-500 animate-pulse" : "border-earth-200 hover:bg-earth-50"
             }`}
           >
             🎤
           </button>
         )}
         <button onClick={() => handleSend()} disabled={loading}
-          className="bg-primary-600 text-white px-4 py-2 rounded font-medium disabled:opacity-50">
-          {loading ? "..." : "Send"}
+          className="bg-primary-600 text-white px-4 py-2 rounded-md font-medium hover:bg-primary-700 disabled:opacity-50">
+          {loading ? "..." : t("chat_send")}
         </button>
       </div>
     </div>

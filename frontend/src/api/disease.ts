@@ -11,6 +11,9 @@ export const predictDisease = (crop: string, image: File) => {
 
 export const getPrediction = (id: string) => apiClient.get(`/disease/${id}`);
 
+export const getPredictionImageBlob = (id: string) =>
+  apiClient.get(`/disease/${id}/image`, { responseType: "blob" });
+
 export const getCrops = () => apiClient.get("/crops");
 
 export const getHistory = (params?: Record<string, string>) =>
@@ -19,8 +22,8 @@ export const getHistory = (params?: Record<string, string>) =>
 export const getWeather = (location: string) =>
   apiClient.get("/weather", { params: { location } });
 
-export const sendChatMessage = (message: string, conversationId?: string) =>
-  apiClient.post("/chatbot/message", { message, conversation_id: conversationId });
+export const sendChatMessage = (message: string, conversationId?: string, locale?: string) =>
+  apiClient.post("/chatbot/message", { message, conversation_id: conversationId, locale });
 
 export const generateReport = (predictionId: string) =>
   apiClient.post(`/reports/generate/${predictionId}`);

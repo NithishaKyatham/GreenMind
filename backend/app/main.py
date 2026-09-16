@@ -39,6 +39,11 @@ app.add_middleware(
 
 @app.on_event("startup")
 def on_startup():
+    if settings.ENVIRONMENT.lower() == "production" and (
+        settings.JWT_SECRET == "insecure-dev-secret-change-me" or len(settings.JWT_SECRET) < 32
+    ):
+        raise RuntimeError("Set JWT_SECRET to a random value of at least 32 characters in production.")
+
     # Create DB tables if they don't exist (dev convenience; use Alembic migrations in production)
     Base.metadata.create_all(bind=engine)
     os.makedirs(settings.UPLOAD_DIR, exist_ok=True)

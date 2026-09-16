@@ -45,6 +45,9 @@ def refresh(refresh_token: str, db: Session = Depends(get_db)):
     if payload is None or payload.get("type") != "refresh":
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid refresh token")
     user_id = payload.get("sub")
+    user = get_user_by_id(db, user_id) if user_id else None
+    if user is None or not user.is_active:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid refresh token")
     new_access = create_access_token(subject=user_id)
     new_refresh = create_refresh_token(subject=user_id)
     return Token(access_token=new_access, refresh_token=new_refresh)

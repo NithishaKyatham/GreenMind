@@ -1,6 +1,6 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
-import NavBar from "./components/NavBar";
+import AppShell from "./components/layout/AppShell";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 import Landing from "./pages/Landing";
@@ -18,26 +18,23 @@ import Admin from "./pages/Admin";
 
 const App: React.FC = () => {
   return (
-    <div className="min-h-screen flex flex-col">
-      <NavBar />
-      <main className="flex-1">
-        <Routes>
-          <Route path="/" element={<Landing />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
+    <AppShell>
+      <Routes>
+        <Route path="/" element={<Landing />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
 
-          <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-          <Route path="/detect" element={<ProtectedRoute><Detect /></ProtectedRoute>} />
-          <Route path="/result/:id" element={<ProtectedRoute><Result /></ProtectedRoute>} />
-          <Route path="/history" element={<ProtectedRoute><History /></ProtectedRoute>} />
-          <Route path="/history/:id" element={<ProtectedRoute><HistoryDetail /></ProtectedRoute>} />
-          <Route path="/weather" element={<ProtectedRoute><Weather /></ProtectedRoute>} />
-          <Route path="/chat" element={<ProtectedRoute><Chat /></ProtectedRoute>} />
-          <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-          <Route path="/admin" element={<ProtectedRoute adminOnly><Admin /></ProtectedRoute>} />
-        </Routes>
-      </main>
-    </div>
+        <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+        <Route path="/detect" element={<ProtectedRoute><Detect /></ProtectedRoute>} />
+        <Route path="/result/:id" element={<ProtectedRoute><Result /></ProtectedRoute>} />
+        <Route path="/history" element={<ProtectedRoute><History /></ProtectedRoute>} />
+        <Route path="/history/:id" element={<ProtectedRoute><HistoryDetail /></ProtectedRoute>} />
+        <Route path="/weather" element={<ProtectedRoute><Weather /></ProtectedRoute>} />
+        <Route path="/chat" element={<ProtectedRoute><Chat /></ProtectedRoute>} />
+        <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+        <Route path="/admin" element={<ProtectedRoute adminOnly><Admin /></ProtectedRoute>} />
+      </Routes>
+    </AppShell>
   );
 };
 

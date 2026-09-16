@@ -10,6 +10,7 @@ import uuid
 import logging
 
 from fastapi import APIRouter, Depends, UploadFile, File, Form, HTTPException, status
+from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
@@ -23,6 +24,7 @@ from app.ml.preprocessing import (
 )
 from app.ml.predictor import predict, severity_for, status_for
 from app.services.recommendation_service import get_recommendation, DISCLAIMER
+from app.services.prediction_response_service import build_prediction_response
 from app.repositories.prediction_repository import (
     create_prediction,
     attach_recommendation,
@@ -388,141 +390,51 @@ def get_prediction(
         )
 
     # -----------------------------------------------------------------------
-    # 2. Parse the model's original prediction
-    # -----------------------------------------------------------------------
-    identified_crop, disease_label = _parse_crop_and_disease(
-        prediction.disease
-    )
-
-    # -----------------------------------------------------------------------
-    # 3. Determine the normal prediction status
-    # -----------------------------------------------------------------------
-    pred_status = status_for(
-        prediction.confidence,
-        prediction.is_fallback_prediction,
-    )
-
-    severity = prediction.severity
-
-    # -----------------------------------------------------------------------
-    # 4. Detect crop mismatch
-    # -----------------------------------------------------------------------
-    # The database crop now contains the crop selected by the user.
+    # 2. Build the safe response.
     #
-    # Example:
-    #   Stored crop       = Apple
-    #   Model prediction  = Strawberry___Leaf_scorch
-    #
-    # Therefore this is an uncertain result.
-    crop_mismatch = (
-        prediction.crop
-        and identified_crop.lower() not in ("unknown", prediction.crop.lower())
+    # This logic (crop-mismatch detection, low-confidence handling,
+    # recommendation lookup) is shared with the AI agent's
+    # analyze_crop_image tool via prediction_response_service, so both
+    # paths are guaranteed to apply the exact same safety behavior rather
+    # than risking two copies drifting apart.
+    # -----------------------------------------------------------------------
+    return build_prediction_response(prediction)
+
+
+@router.get("/{prediction_id}/image")
+def get_prediction_image(
+    prediction_id: str,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """
+    Serves the uploaded leaf photo for a prediction. Authenticated and
+    ownership-checked via the same get_prediction_by_id lookup as
+    get_prediction — a plain static file mount was deliberately avoided
+    here since that would let anyone with a guessable path view another
+    user's photo.
+    """
+    prediction = get_prediction_by_id(
+        db,
+        prediction_id,
+        current_user.id,
     )
 
-    # -----------------------------------------------------------------------
-    # 5. Crop mismatch = unsafe to diagnose
-    # -----------------------------------------------------------------------
-    if crop_mismatch:
-
-        pred_status = "low_confidence"
-        severity = "Low"
-
-        display_disease = "Unable to confidently identify"
-
-        description = (
-            f"The selected crop is '{prediction.crop}', but the AI model "
-            f"detected features associated with '{identified_crop}'. "
-            "GreenMind cannot reliably diagnose this image. "
-            "Please upload a clear photo of a single leaf in good lighting."
+    if not prediction:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Prediction not found",
         )
 
-        possible_disease = (
-            f"{identified_crop} - {disease_label}"
+    if not prediction.image_path or not os.path.isfile(prediction.image_path):
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Image not found",
         )
 
-        crop_mismatch_note = (
-            f"You selected '{prediction.crop}', but the image was identified "
-            f"as '{identified_crop}'. The result is not considered a reliable "
-            f"diagnosis."
-        )
-
-    # -----------------------------------------------------------------------
-    # 6. Normal low-confidence prediction
-    # -----------------------------------------------------------------------
-    elif pred_status == "low_confidence":
-
-        severity = "Low"
-
-        display_disease = "Unable to confidently identify"
-
-        description = _LOW_CONFIDENCE_DESCRIPTION
-
-        possible_disease = (
-            f"{identified_crop} - {disease_label}"
-        )
-
-        crop_mismatch_note = None
-
-    # -----------------------------------------------------------------------
-    # 7. Normal confident prediction
-    # -----------------------------------------------------------------------
-    else:
-
-        display_disease = disease_label
-
-        possible_disease = None
-
-        crop_mismatch_note = None
-
-        rec_data = get_recommendation(
-            prediction.disease
-        )
-
-        description = rec_data.get(
-            "description",
-            "",
-        )
-
-    # -----------------------------------------------------------------------
-    # 8. Return safe prediction response
-    # -----------------------------------------------------------------------
-    return PredictionOut(
-        id=prediction.id,
-
-        # Always return the user's selected crop.
-        crop=prediction.crop,
-
-        disease=display_disease,
-
-        confidence=round(
-            prediction.confidence,
-            4,
-        ),
-
-        severity=severity,
-
-        status=pred_status,
-
-        description=description,
-
-        is_fallback_prediction=prediction.is_fallback_prediction,
-
-        disclaimer=DISCLAIMER,
-
-        image_path=prediction.image_path,
-
-        created_at=prediction.created_at,
-
-        # For mismatch/uncertain results, do NOT expose the stored
-        # disease-specific recommendation as an active recommendation.
-        recommendation=(
-            _LOW_CONFIDENCE_RECOMMENDATION
-            if pred_status == "low_confidence"
-            else prediction.recommendation
-        ),
-
-        possible_disease=possible_disease,
-
-        crop_mismatch_note=crop_mismatch_note,
+    ext = os.path.splitext(prediction.image_path)[1].lower()
+    media_type = {".png": "image/png", ".jpg": "image/jpeg", ".jpeg": "image/jpeg"}.get(
+        ext, "application/octet-stream"
     )
+    return FileResponse(prediction.image_path, media_type=media_type)
 

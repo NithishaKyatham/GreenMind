@@ -7,7 +7,7 @@ services:
     restart: unless-stopped
     environment:
       POSTGRES_USER: greenmind_user
-      POSTGRES_PASSWORD: greenmind_pass
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
       POSTGRES_DB: greenmind_db
     ports:
       - "5432:5432"
@@ -28,7 +28,7 @@ services:
     env_file:
       - .env
     environment:
-      DATABASE_URL: postgresql+psycopg2://greenmind_user:greenmind_pass@db:5432/greenmind_db
+      DATABASE_URL: postgresql+psycopg2://greenmind_user:${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}@db:5432/greenmind_db
       USE_SQLITE: "false"
       # Absolute paths inside the container — override the relative dev
       # defaults in .env, which assume `cwd == backend/` on the host and

@@ -29,3 +29,27 @@ def get_recommendation(disease: str, severity: Optional[str] = None) -> dict:
     if entry is None:
         entry = _RULES["_default"]
     return entry
+def find_disease_class(crop: str, disease: str) -> Optional[str]:
+    """
+    Resolve a human-readable crop + disease pair to the exact
+    recommendation-rule/model class key.
+
+    Returns None when there is no exact configured match.
+    Never guesses.
+    """
+    target_crop = crop.strip().lower()
+    target_disease = disease.strip().lower()
+
+    for disease_class, entry in _RULES.get("diseases", {}).items():
+        normalized_class = disease_class.replace("___", " - ").replace("_", " ").lower()
+
+        if target_crop in normalized_class and target_disease in normalized_class:
+            return disease_class
+
+        entry_crop = str(entry.get("crop", "")).strip().lower()
+        entry_disease = str(entry.get("disease", "")).strip().lower()
+
+        if entry_crop == target_crop and entry_disease == target_disease:
+            return disease_class
+
+    return None

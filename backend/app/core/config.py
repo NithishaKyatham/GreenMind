@@ -13,7 +13,7 @@ class Settings(BaseSettings):
     API_PREFIX: str = "/api"
 
     # Database
-    DATABASE_URL: str = "postgresql+psycopg2://greenmind_user:greenmind_pass@localhost:5432/greenmind_db"
+    DATABASE_URL: str = ""
     USE_SQLITE: bool = False
     SQLITE_PATH: str = "./greenmind_dev.db"
 
@@ -24,7 +24,7 @@ class Settings(BaseSettings):
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7
 
     # Weather
-    WEATHER_API_KEY: str = "ed00afc64c4bec990f544ab200b6887d"
+    WEATHER_API_KEY: str = ""
     WEATHER_API_BASE_URL: str = "https://api.openweathermap.org/data/2.5"
 
     # AI Assistant
@@ -62,6 +62,8 @@ class Settings(BaseSettings):
     def sqlalchemy_database_url(self) -> str:
         if self.USE_SQLITE:
             return f"sqlite:///{self.SQLITE_PATH}"
+        if not self.DATABASE_URL:
+            raise ValueError("DATABASE_URL must be set when USE_SQLITE is false.")
         return self.DATABASE_URL
 
 

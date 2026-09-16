@@ -64,7 +64,10 @@ def load_model():
             model = tvm.resnet18(weights=None)
             model.fc = torch.nn.Linear(model.fc.in_features, len(_class_names))
 
-        state_dict = torch.load(settings.MODEL_PATH, map_location="cpu")
+        # The shipped artifact is a plain state dictionary. Restrict loading
+        # to tensor weights so a replaced model file cannot execute pickle
+        # payloads at backend startup.
+        state_dict = torch.load(settings.MODEL_PATH, map_location="cpu", weights_only=True)
         model.load_state_dict(state_dict)
         model.eval()
 
