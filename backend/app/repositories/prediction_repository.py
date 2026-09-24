@@ -9,11 +9,13 @@ from app.models.recommendation import Recommendation
 def create_prediction(
     db: Session, user_id: str, crop: str, image_path: str,
     disease: str, confidence: float, severity: str, is_fallback: bool,
+    context_json: Optional[str] = None,
 ) -> DiseasePrediction:
     prediction = DiseasePrediction(
         user_id=user_id, crop=crop, image_path=image_path,
         disease=disease, confidence=confidence, severity=severity,
         is_fallback_prediction=is_fallback,
+        context_json=context_json,
     )
     db.add(prediction)
     db.commit()

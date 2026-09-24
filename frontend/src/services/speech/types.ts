@@ -61,11 +61,26 @@ export interface TextToSpeechService {
   isSupported(): boolean;
 
   /** Speaks `text` in the given locale. Cancels any speech already in progress. */
-  speak(text: string, locale: string): void;
+  speak(
+    text: string,
+    locale: string,
+    onEnd?: () => void,
+    onError?: (error: SpeechErrorInfo) => void
+  ): void;
+
+  getVoiceAvailability?(locale: string): {
+    available: boolean;
+    loading: boolean;
+    voice: SpeechSynthesisVoice | null;
+  };
+
+  getAvailableVoiceLanguages?(): import("./voiceSelection").AvailableVoiceLanguage[];
+
+  subscribeVoiceAvailability?(listener: () => void): () => void;
 
   /** Stops any speech currently playing. Safe to call when idle. */
   cancel(): void;
 }
 
 export type SttProviderName = "browser" | "whisper" | "azure";
-export type TtsProviderName = "browser" | "azure";
+export type TtsProviderName = "browser" | "azure" | "backend";

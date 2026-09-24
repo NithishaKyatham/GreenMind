@@ -31,6 +31,12 @@ class Settings(BaseSettings):
     AI_API_KEY: str = ""
     AI_API_PROVIDER: str = "anthropic"
 
+    # Text to speech
+    AZURE_SPEECH_KEY: str = ""
+    AZURE_SPEECH_REGION: str = ""
+    TTS_TIMEOUT_SECONDS: float = 15.0
+    TTS_MAX_TEXT_LENGTH: int = 10000
+
     # ML Model
     MODEL_PATH: str = "../ml/models/crop_disease_model.pt"
     MODEL_ARCHITECTURE: str = "efficientnet_b0"
@@ -40,6 +46,10 @@ class Settings(BaseSettings):
     # rather than a specific diagnosis — protects against confidently-wrong
     # answers on images the model wasn't trained to handle well.
     CONFIDENCE_THRESHOLD: float = 0.60
+
+    # Explainable AI (on-demand LIME explanations)
+    XAI_LIME_NUM_SAMPLES: int = 100
+    XAI_LIME_NUM_FEATURES: int = 10
 
     # Uploads
     UPLOAD_DIR: str = "./uploads"

@@ -22,7 +22,7 @@ describe("speech service factory", () => {
     vi.unstubAllEnvs();
   });
 
-  it("defaults to the browser provider when no env vars are set", () => {
+  it("defaults to the browser TTS provider without cloud dependencies", () => {
     mockBrowserSpeechSupport(true);
     const stt = createSpeechRecognitionService();
     const tts = createTextToSpeechService();

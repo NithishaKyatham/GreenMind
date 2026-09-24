@@ -15,6 +15,14 @@ class RecommendationOut(BaseModel):
         from_attributes = True
 
 
+class PredictionContextOut(BaseModel):
+    season: Optional[str] = None
+    region: Optional[str] = None
+    crop_stage: Optional[str] = None
+    soil_info: Optional[str] = None
+    weather: Optional[dict] = None
+
+
 class PredictionOut(BaseModel):
     id: str
     crop: str
@@ -32,6 +40,7 @@ class PredictionOut(BaseModel):
     # shown as a soft hint, never as a confirmed diagnosis.
     possible_disease: Optional[str] = None
     crop_mismatch_note: Optional[str] = None
+    context: Optional[PredictionContextOut] = None
 
     class Config:
         from_attributes = True

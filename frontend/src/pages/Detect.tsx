@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getCrops, predictDisease } from "../api/disease";
 import { useLanguage } from "../context/LanguageContext";
+import { useAuth } from "../context/AuthContext";
 
 interface Crop {
   id: string;
@@ -13,7 +14,8 @@ type Step = "capture" | "preview" | "analyzing";
 
 const Detect: React.FC = () => {
   const navigate = useNavigate();
-  const { t } = useLanguage();
+  const { t, locale } = useLanguage();
+  const { user } = useAuth();
   const [crops, setCrops] = useState<Crop[]>([]);
   const [selectedCrop, setSelectedCrop] = useState("");
   const [file, setFile] = useState<File | null>(null);
@@ -22,6 +24,10 @@ const Detect: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [step, setStep] = useState<Step>("capture");
   const [stageIndex, setStageIndex] = useState(0);
+  const [season, setSeason] = useState("");
+  const [region, setRegion] = useState("");
+  const [cropStage, setCropStage] = useState("");
+  const [soilInfo, setSoilInfo] = useState("");
 
   const cameraInputRef = useRef<HTMLInputElement>(null);
   const galleryInputRef = useRef<HTMLInputElement>(null);
@@ -32,6 +38,10 @@ const Detect: React.FC = () => {
       if (res.data.length > 0) setSelectedCrop(res.data[0].name);
     });
   }, []);
+
+  useEffect(() => {
+    if (user?.location && !region) setRegion(user.location);
+  }, [user?.location, region]);
 
   const stages = [
     t("detect_stage_1"),
@@ -82,7 +92,12 @@ const Detect: React.FC = () => {
     setError(null);
     setStep("analyzing");
     try {
-      const res = await predictDisease(selectedCrop, file);
+      const res = await predictDisease(selectedCrop, file, locale, {
+        season,
+        region,
+        crop_stage: cropStage,
+        soil_info: soilInfo,
+      });
       navigate(`/result/${res.data.id}`);
     } catch (err: any) {
       setError(err.response?.data?.detail || t("detect_error_failed"));
@@ -135,6 +150,29 @@ const Detect: React.FC = () => {
               </option>
             ))}
           </select>
+
+          <details className="mb-5 border border-earth-200 rounded-md p-3 bg-earth-50">
+            <summary className="text-sm font-medium text-earth-800 cursor-pointer">{t("detect_context_title")}</summary>
+            <p className="text-xs text-earth-500 mt-2 mb-3">{t("detect_context_help")}</p>
+            <div className="grid gap-3">
+              <label className="text-sm text-earth-700">
+                {t("detect_season")}
+                <input value={season} onChange={(e) => setSeason(e.target.value)} placeholder={t("detect_season_placeholder")} className="w-full border border-earth-200 rounded-md px-3 py-2 mt-1 bg-white" />
+              </label>
+              <label className="text-sm text-earth-700">
+                {t("detect_region")}
+                <input value={region} onChange={(e) => setRegion(e.target.value)} placeholder={t("detect_region_placeholder")} className="w-full border border-earth-200 rounded-md px-3 py-2 mt-1 bg-white" />
+              </label>
+              <label className="text-sm text-earth-700">
+                {t("detect_crop_stage")}
+                <input value={cropStage} onChange={(e) => setCropStage(e.target.value)} placeholder={t("detect_crop_stage_placeholder")} className="w-full border border-earth-200 rounded-md px-3 py-2 mt-1 bg-white" />
+              </label>
+              <label className="text-sm text-earth-700">
+                {t("detect_soil_info")}
+                <input value={soilInfo} onChange={(e) => setSoilInfo(e.target.value)} placeholder={t("detect_soil_info_placeholder")} className="w-full border border-earth-200 rounded-md px-3 py-2 mt-1 bg-white" />
+              </label>
+            </div>
+          </details>
 
           <ul className="text-sm text-earth-600 space-y-1.5 mb-5">
             <li className="flex items-start gap-2">

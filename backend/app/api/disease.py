@@ -8,8 +8,9 @@ recommendation lookup -> persisted prediction record.
 import os
 import uuid
 import logging
+import json
 
-from fastapi import APIRouter, Depends, UploadFile, File, Form, HTTPException, status
+from fastapi import APIRouter, Depends, UploadFile, File, Form, HTTPException, Query, status
 from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 
@@ -23,7 +24,14 @@ from app.ml.preprocessing import (
     ImageValidationError,
 )
 from app.ml.predictor import predict, severity_for, status_for
-from app.services.recommendation_service import get_recommendation, DISCLAIMER
+from app.services.recommendation_service import (
+    DISCLAIMER,
+    get_recommendation,
+    get_safe_recommendation,
+    normalize_locale,
+    normalize_context,
+)
+from app.services.weather_service import fetch_weather
 from app.services.prediction_response_service import build_prediction_response
 from app.repositories.prediction_repository import (
     create_prediction,
@@ -62,27 +70,6 @@ _LOW_CONFIDENCE_DESCRIPTION = (
     "GreenMind's 38 supported classes, or the photo quality (blur, poor "
     "lighting, multiple leaves, background clutter) is affecting the result."
 )
-
-
-_LOW_CONFIDENCE_RECOMMENDATION = {
-    "treatment": (
-        "No confident diagnosis was made, so no specific treatment is "
-        "recommended. If you're seeing visible symptoms, consult a local "
-        "agricultural expert."
-    ),
-    "fertilizer": None,
-    "pesticide_guidance": (
-        "Do not apply pesticides based on an unconfirmed diagnosis."
-    ),
-    "prevention": (
-        "Retake the photo: a single leaf, filling most of the frame, "
-        "in even daylight, against a plain background usually improves results."
-    ),
-    "crop_management": None,
-    "monitoring_advice": (
-        "Continue monitoring the plant and try again if new symptoms develop."
-    ),
-}
 
 
 # ---------------------------------------------------------------------------
@@ -130,10 +117,19 @@ async def predict_disease(
         ...,
         description="User-selected crop from the dropdown (used only as a hint)",
     ),
+    locale: str = Form(
+        "en",
+        description="Selected application locale for localized recommendations",
+    ),
+    season: str | None = Form(None),
+    region: str | None = Form(None),
+    crop_stage: str | None = Form(None),
+    soil_info: str | None = Form(None),
     image: UploadFile = File(...),
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
+    locale = normalize_locale(locale)
     # -----------------------------------------------------------------------
     # 1. Read uploaded image
     # -----------------------------------------------------------------------
@@ -210,6 +206,18 @@ async def predict_disease(
         result.confidence,
     )
 
+    context = normalize_context({
+        "season": season,
+        "region": region or current_user.location,
+        "crop_stage": crop_stage,
+        "soil_info": soil_info,
+    })
+    weather_location = context.get("region")
+    if weather_location:
+        weather = await fetch_weather(weather_location)
+        if weather.get("source") == "live":
+            context["weather"] = weather
+
     # -----------------------------------------------------------------------
     # 6. Detect crop mismatch
     # -----------------------------------------------------------------------
@@ -252,7 +260,7 @@ async def predict_disease(
         severity = "Low"
 
         # Never give disease-specific treatment for a mismatch.
-        rec_data = _LOW_CONFIDENCE_RECOMMENDATION
+        rec_data = get_safe_recommendation(locale)
 
         description = (
             f"The selected crop is '{crop}', but the AI model detected "
@@ -274,7 +282,7 @@ async def predict_disease(
     # -----------------------------------------------------------------------
     elif pred_status == "low_confidence":
 
-        rec_data = _LOW_CONFIDENCE_RECOMMENDATION
+        rec_data = get_safe_recommendation(locale)
 
         description = _LOW_CONFIDENCE_DESCRIPTION
 
@@ -292,6 +300,8 @@ async def predict_disease(
         rec_data = get_recommendation(
             result.disease,
             severity,
+            locale,
+            context,
         )
 
         description = rec_data.get(
@@ -325,6 +335,7 @@ async def predict_disease(
     confidence=result.confidence,
     severity=severity,
     is_fallback=result.is_fallback,
+    context_json=json.dumps(context),
 )
 
     # -----------------------------------------------------------------------
@@ -359,6 +370,7 @@ async def predict_disease(
         recommendation=prediction.recommendation,
         possible_disease=possible_disease,
         crop_mismatch_note=crop_mismatch_note,
+        context=context,
     )
 
 
@@ -371,6 +383,7 @@ async def predict_disease(
 )
 def get_prediction(
     prediction_id: str,
+    locale: str = Query("en", description="Selected application locale"),
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
@@ -398,7 +411,7 @@ def get_prediction(
     # paths are guaranteed to apply the exact same safety behavior rather
     # than risking two copies drifting apart.
     # -----------------------------------------------------------------------
-    return build_prediction_response(prediction)
+    return build_prediction_response(prediction, normalize_locale(locale))
 
 
 @router.get("/{prediction_id}/image")

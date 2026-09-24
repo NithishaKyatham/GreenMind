@@ -5,6 +5,7 @@ import { apiClient } from "../api/client";
 import { useLanguage } from "../context/LanguageContext";
 import { useAuth } from "../context/AuthContext";
 import { useVoice } from "../hooks/useVoice";
+import { LOCALE_NAMES } from "../services/speech/localeMap";
 import PredictionThumbnail from "../components/PredictionThumbnail";
 
 interface Recommendation {
@@ -29,6 +30,13 @@ interface Prediction {
   recommendation: Recommendation | null;
   possible_disease?: string | null;
   crop_mismatch_note?: string | null;
+  context?: {
+    season?: string | null;
+    region?: string | null;
+    crop_stage?: string | null;
+    soil_info?: string | null;
+    weather?: { source?: string; location?: string | null } | null;
+  } | null;
 }
 
 const severityColor: Record<string, string> = {
@@ -49,12 +57,12 @@ const Result: React.FC = () => {
   const { t, locale } = useLanguage();
   const { user } = useAuth();
   const voice = useVoice(locale);
+  const availableVoiceLanguages = voice.availableVoiceLanguages || [];
 
   const [prediction, setPrediction] = useState<Prediction | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [generating, setGenerating] = useState(false);
   const [rainSoon, setRainSoon] = useState(false);
-  const [speaking, setSpeaking] = useState(false);
 
   useEffect(() => {
     if (!id) {
@@ -63,13 +71,13 @@ const Result: React.FC = () => {
     }
     setPrediction(null);
     setError(null);
-    getPrediction(id)
+    getPrediction(id, locale)
       .then((res) => setPrediction(res.data))
       .catch((err) => {
         console.error("Failed to load prediction:", err);
         setError(err?.response?.data?.detail || t("result_error_load_failed"));
       });
-  }, [id]);
+  }, [id, locale]);
 
   // Real, conditional weather tie-in — only shown when the farmer has a
   // saved location AND the actual forecast indicates meaningful rain
@@ -87,38 +95,23 @@ const Result: React.FC = () => {
       .catch(() => setRainSoon(false));
   }, [user?.location]);
 
-  // Spoken summary. The connective phrases below come from the same
-  // translated UI strings shown on screen, so those parts genuinely speak
-  // in the selected language. The disease description and recommendation
-  // text do NOT — GreenMind's recommendation content
-  // (recommendation_rules.json) only exists in English today, so that
-  // part is read as-is regardless of locale. Translating that content
-  // is a backend data task (adding per-locale fields), not something
-  // this page can fabricate.
-  const spokenSummary = useMemo(() => {
-    if (!prediction) return "";
-    const parts: string[] = [];
-    parts.push(`${prediction.crop}.`);
-    parts.push(`${prediction.disease}.`);
-    if (prediction.status !== "low_confidence") {
-      parts.push(`${t("result_confidence")}: ${Math.round(prediction.confidence * 100)}%.`);
-      parts.push(`${severityWord(t, prediction.severity)}.`);
-    }
-    if (prediction.description) parts.push(prediction.description);
-    if (prediction.recommendation?.treatment) parts.push(prediction.recommendation.treatment);
-    if (prediction.recommendation?.pesticide_guidance) parts.push(prediction.recommendation.pesticide_guidance);
-    if (prediction.recommendation?.prevention) parts.push(prediction.recommendation.prevention);
-    return parts.join(" ");
-  }, [prediction, t, locale]);
+  const recommendationSpeechText = useMemo(() => {
+    if (!prediction?.recommendation) return "";
 
-  // Auto-play once the diagnosis is ready.
-  useEffect(() => {
-    if (prediction && voice.supported && spokenSummary) {
-      voice.speak(spokenSummary);
-      setSpeaking(true);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [prediction?.id, voice.supported]);
+    const fields: [string, string | undefined][] = [
+      [t("result_treatment"), prediction.recommendation.treatment],
+      [t("result_fertilizer"), prediction.recommendation.fertilizer],
+      [t("result_pesticide"), prediction.recommendation.pesticide_guidance],
+      [t("result_prevention"), prediction.recommendation.prevention],
+      [t("result_crop_management"), prediction.recommendation.crop_management],
+      [t("result_monitoring"), prediction.recommendation.monitoring_advice],
+    ];
+
+    return fields
+      .filter(([, value]) => value)
+      .map(([label, value]) => `${label}: ${value}`)
+      .join(". ");
+  }, [prediction, t, locale]);
 
   const handleGenerateReport = async () => {
     if (!id) return;
@@ -235,34 +228,78 @@ const Result: React.FC = () => {
           </div>
         </div>
 
-        {voice.supported && (
-          <div className="flex flex-wrap items-center gap-2 mt-4 pt-4 border-t border-earth-100">
-            <button
-              onClick={() => {
-                voice.speak(spokenSummary);
-                setSpeaking(true);
-              }}
-              className="text-xs font-medium flex items-center gap-1 border border-earth-200 rounded-md px-3 py-1.5 hover:bg-earth-50"
-            >
-              🔊 {t("voice_replay")}
-            </button>
-            <button
-              onClick={() => {
-                voice.stopSpeaking();
-                setSpeaking(false);
-              }}
-              className="text-xs font-medium flex items-center gap-1 border border-earth-200 rounded-md px-3 py-1.5 hover:bg-earth-50"
-            >
-              ⏹ {t("voice_stop")}
-            </button>
-            {speaking && <span className="text-xs text-primary-600">{t("voice_speaking")}</span>}
-          </div>
-        )}
       </div>
 
       {rainSoon && (
         <div className="bg-info-50 text-info-700 text-sm p-3 rounded-md mb-4 border border-info-500/20">
           ☔ {t("result_weather_rain_caution")}
+        </div>
+      )}
+
+      {prediction.context && (
+        <details className="bg-white rounded-lg border border-earth-200 shadow-soft p-4 mb-3">
+          <summary className="font-semibold text-earth-900 cursor-pointer">{t("result_context_used")}</summary>
+          <div className="mt-3 space-y-1 text-sm text-earth-700">
+            {prediction.context.season && <p><strong>{t("result_context_season")}:</strong> {prediction.context.season} ({t("result_context_farmer_provided")})</p>}
+            {prediction.context.region && <p><strong>{t("result_context_region")}:</strong> {prediction.context.region} ({t("result_context_farmer_provided")})</p>}
+            {prediction.context.crop_stage && <p><strong>{t("result_context_crop_stage")}:</strong> {prediction.context.crop_stage} ({t("result_context_farmer_provided")})</p>}
+            {prediction.context.soil_info && <p><strong>{t("result_context_soil")}:</strong> {prediction.context.soil_info} ({t("result_context_farmer_provided")})</p>}
+            {prediction.context.weather?.source === "live" && (
+              <p><strong>{t("result_context_weather")}:</strong> {prediction.context.weather.location || prediction.context.region || t("result_context_location_unknown")} ({t("result_context_live")})</p>
+            )}
+          </div>
+        </details>
+      )}
+
+      {prediction.recommendation && recommendationSpeechText && (
+        <div className="bg-white rounded-lg border border-earth-200 shadow-soft p-5 mb-3">
+          {voice.ttsSupported ? (
+            <div className="flex flex-wrap items-center gap-2">
+              <button
+                onClick={() => voice.speak(recommendationSpeechText)}
+                disabled={voice.voiceLoading || voice.voiceAvailable === false}
+                className="text-sm font-medium flex items-center gap-2 border border-earth-200 rounded-md px-3 py-2 hover:bg-earth-50"
+              >
+                🔊 {t("voice_listen_recommendation")}
+              </button>
+              {voice.speaking && (
+                <button
+                  onClick={voice.stopSpeaking}
+                  className="text-sm font-medium flex items-center gap-2 border border-earth-200 rounded-md px-3 py-2 hover:bg-earth-50"
+                >
+                  ⏹ {t("voice_stop")}
+                </button>
+              )}
+              {voice.speaking && <span className="text-xs text-primary-600">{t("voice_speaking")}</span>}
+              {voice.error && <span className="text-xs text-danger-600">{voice.error}</span>}
+              {!voice.error && voice.voiceAvailable === false && (
+                <span className="text-xs text-danger-600">
+                  A voice for {LOCALE_NAMES[locale] || locale} is not available on this device.
+                </span>
+              )}
+            </div>
+          ) : (
+            <p className="text-sm text-earth-500">{t("voice_unavailable")}</p>
+          )}
+          <div className="mt-4 pt-3 border-t border-earth-100">
+            <p className="text-xs font-medium text-earth-700">🔊 Voice languages available on this device</p>
+            <p className="text-xs text-earth-500 mt-1">
+              These are device voices, separate from GreenMind translation languages.
+            </p>
+            {voice.voiceLoading ? (
+              <p className="text-xs text-earth-500 mt-2">Checking available voices...</p>
+            ) : availableVoiceLanguages.length === 0 ? (
+              <p className="text-xs text-earth-500 mt-2">No speech voices are available on this device.</p>
+            ) : (
+              <ul className="flex flex-wrap gap-x-3 gap-y-1 mt-2" aria-label="Available voice languages">
+                {availableVoiceLanguages.map((language) => (
+                  <li key={language.code} className="text-xs text-earth-700">
+                    {language.flag && `${language.flag} `}{language.name}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
         </div>
       )}
 

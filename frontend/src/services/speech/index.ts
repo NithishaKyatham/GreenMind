@@ -2,6 +2,7 @@ import { SpeechRecognitionService, TextToSpeechService, SttProviderName, TtsProv
 import { WebSpeechRecognitionService, WebSpeechTextToSpeechService } from "./webSpeechProvider";
 import { WhisperSpeechRecognitionService } from "./whisperProvider";
 import { AzureSpeechRecognitionService, AzureTextToSpeechService } from "./azureProvider";
+import { BackendTextToSpeechService } from "./backendProvider";
 
 /**
  * Single place that decides which speech provider is active. Nothing
@@ -12,7 +13,7 @@ import { AzureSpeechRecognitionService, AzureTextToSpeechService } from "./azure
  * Selection order:
  *   1. An explicit override passed by the caller (mainly for tests).
  *   2. VITE_STT_PROVIDER / VITE_TTS_PROVIDER env vars, if set.
- *   3. Default: "browser" (Web Speech API — no key, no network dependency).
+ *   3. Default TTS: "browser" (free Web Speech API, no API key required).
  *
  * If the selected provider reports itself unsupported (e.g. "azure" was
  * requested but VITE_AZURE_SPEECH_KEY isn't set, or the browser lacks
@@ -61,6 +62,9 @@ export function createTextToSpeechService(
   switch (requested) {
     case "azure":
       service = new AzureTextToSpeechService();
+      break;
+    case "backend":
+      service = new BackendTextToSpeechService();
       break;
     case "browser":
     default:

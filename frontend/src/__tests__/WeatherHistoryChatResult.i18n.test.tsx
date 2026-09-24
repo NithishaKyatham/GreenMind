@@ -3,12 +3,25 @@ import { render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter, Routes, Route } from "react-router-dom";
 import React from "react";
 
+const voiceSpeak = vi.fn();
+const voiceStop = vi.fn();
+
 vi.mock("../context/AuthContext", () => ({
   useAuth: () => ({ user: { name: "Asha", location: "" }, loading: false }),
 }));
 
 vi.mock("../hooks/useVoice", () => ({
-  useVoice: () => ({ supported: false, listening: false, error: null, speak: vi.fn(), startListening: vi.fn(), stopListening: vi.fn() }),
+  useVoice: () => ({
+    supported: false,
+    ttsSupported: true,
+    speaking: true,
+    listening: false,
+    error: null,
+    speak: voiceSpeak,
+    stopSpeaking: voiceStop,
+    startListening: vi.fn(),
+    stopListening: vi.fn(),
+  }),
 }));
 
 vi.mock("../api/disease", () => ({
@@ -27,7 +40,14 @@ vi.mock("../api/disease", () => ({
       description: "A fungal disease.",
       is_fallback_prediction: false,
       disclaimer: "Informational only.",
-      recommendation: { treatment: "Apply fungicide." },
+      recommendation: {
+        treatment: "ప్రభావిత ఆకులను తొలగించండి.",
+        fertilizer: "సమతుల్య ఎరువులు వాడండి.",
+        pesticide_guidance: "ఉత్పత్తి లేబుల్‌ను అనుసరించండి.",
+        prevention: "గాలి ప్రసరణను మెరుగుపరచండి.",
+        crop_management: "సోకిన ఆకులను తొలగించండి.",
+        monitoring_advice: "ప్రతి మూడు రోజులకు పరిశీలించండి.",
+      },
     },
   }),
   generateReport: vi.fn(),
@@ -38,6 +58,7 @@ import Weather from "../pages/Weather";
 import History from "../pages/History";
 import Chat from "../pages/Chat";
 import Result from "../pages/Result";
+import { getPrediction } from "../api/disease";
 
 const InTelugu: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { setLocale } = useLanguage();
@@ -108,5 +129,34 @@ describe("Weather/History/Chat/Result localization", () => {
       ).toBeInTheDocument();
       expect(screen.getByText("ఎక్కువ")).toBeInTheDocument(); // "High" severity
     });
+  });
+
+  it("speaks the full recommendation and exposes a stop control", async () => {
+    render(
+      <MemoryRouter initialEntries={["/result/p1"]}>
+        <LanguageProvider>
+          <InTelugu>
+            <Routes>
+              <Route path="/result/:id" element={<Result />} />
+            </Routes>
+          </InTelugu>
+        </LanguageProvider>
+      </MemoryRouter>
+    );
+
+    const listen = await screen.findByRole("button", { name: /సిఫార్సును వినండి/ });
+    listen.click();
+
+      expect(voiceSpeak).toHaveBeenCalledWith(
+      expect.stringContaining("ప్రభావిత ఆకులను తొలగించండి.")
+    );
+    expect(voiceSpeak).toHaveBeenCalledWith(
+      expect.stringContaining("ప్రతి మూడు రోజులకు పరిశీలించండి.")
+    );
+
+    expect(getPrediction).toHaveBeenCalledWith("p1", "te");
+
+    screen.getByRole("button", { name: /ఆపు/ }).click();
+    expect(voiceStop).toHaveBeenCalled();
   });
 });

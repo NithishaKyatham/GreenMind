@@ -11,7 +11,7 @@ from fastapi.exceptions import RequestValidationError
 
 from app.core.config import settings
 from app.core.database import Base, engine
-from app.api import auth, crops, disease, history, weather, chatbot, reports, admin
+from app.api import auth, crops, disease, history, weather, chatbot, reports, admin, tts, xai
 from app.ml import model_loader
 
 logging.basicConfig(
@@ -95,11 +95,13 @@ def health_check():
 app.include_router(auth.router, prefix=settings.API_PREFIX)
 app.include_router(crops.router, prefix=settings.API_PREFIX)
 app.include_router(disease.router, prefix=settings.API_PREFIX)
+app.include_router(xai.router, prefix=settings.API_PREFIX)
 app.include_router(history.router, prefix=settings.API_PREFIX)
 app.include_router(weather.router, prefix=settings.API_PREFIX)
 app.include_router(chatbot.router, prefix=settings.API_PREFIX)
 app.include_router(reports.router, prefix=settings.API_PREFIX)
 app.include_router(admin.router, prefix=settings.API_PREFIX)
+app.include_router(tts.router, prefix=settings.API_PREFIX)
 # Note: there is no separate recommendations.router — recommendations are
 # generated inline during /api/disease/predict and returned as part of the
 # prediction response (see app/services/recommendation_service.py), since

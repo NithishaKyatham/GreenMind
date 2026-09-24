@@ -12,9 +12,16 @@ two copies that could silently drift apart. The ML inference itself
 status_for/severity_for) are untouched.
 """
 from typing import Optional
+import json
 
 from app.ml.predictor import status_for
-from app.services.recommendation_service import get_recommendation, DISCLAIMER
+from app.services.recommendation_service import (
+    DISCLAIMER,
+    get_recommendation,
+    get_safe_recommendation,
+    normalize_locale,
+    normalize_context,
+)
 from app.schemas.prediction import PredictionOut
 
 _LOW_CONFIDENCE_DESCRIPTION = (
@@ -23,27 +30,6 @@ _LOW_CONFIDENCE_DESCRIPTION = (
     "GreenMind's 38 supported classes, or the photo quality (blur, poor "
     "lighting, multiple leaves, background clutter) is affecting the result."
 )
-
-_LOW_CONFIDENCE_RECOMMENDATION = {
-    "treatment": (
-        "No confident diagnosis was made, so no specific treatment is "
-        "recommended. If you're seeing visible symptoms, consult a local "
-        "agricultural expert."
-    ),
-    "fertilizer": None,
-    "pesticide_guidance": (
-        "Do not apply pesticides based on an unconfirmed diagnosis."
-    ),
-    "prevention": (
-        "Retake the photo: a single leaf, filling most of the frame, "
-        "in even daylight, against a plain background usually improves results."
-    ),
-    "crop_management": None,
-    "monitoring_advice": (
-        "Continue monitoring the plant and try again if new symptoms develop."
-    ),
-}
-
 
 def _parse_crop_and_disease(raw_class: str) -> tuple[str, str]:
     parts = raw_class.split("___")
@@ -54,12 +40,18 @@ def _parse_crop_and_disease(raw_class: str) -> tuple[str, str]:
     return crop, disease
 
 
-def build_prediction_response(prediction) -> PredictionOut:
+def build_prediction_response(prediction, locale: str = "en") -> PredictionOut:
     """
     prediction: a DiseasePrediction ORM row already confirmed to belong to
     the requesting user (ownership must be checked by the caller, e.g. via
     get_prediction_by_id(db, prediction_id, user_id), before this is called).
     """
+    locale = normalize_locale(locale)
+    context = normalize_context(
+        json.loads(prediction.context_json)
+        if getattr(prediction, "context_json", None)
+        else None
+    )
     identified_crop, disease_label = _parse_crop_and_disease(prediction.disease)
 
     pred_status = status_for(prediction.confidence, prediction.is_fallback_prediction)
@@ -86,7 +78,7 @@ def build_prediction_response(prediction) -> PredictionOut:
             f"as '{identified_crop}'. The result is not considered a reliable "
             f"diagnosis."
         )
-        recommendation = _LOW_CONFIDENCE_RECOMMENDATION
+        recommendation = get_safe_recommendation(locale)
 
     elif pred_status == "low_confidence":
         severity = "Low"
@@ -94,15 +86,15 @@ def build_prediction_response(prediction) -> PredictionOut:
         description = _LOW_CONFIDENCE_DESCRIPTION
         possible_disease = f"{identified_crop} - {disease_label}"
         crop_mismatch_note = None
-        recommendation = _LOW_CONFIDENCE_RECOMMENDATION
+        recommendation = get_safe_recommendation(locale)
 
     else:
         display_disease = disease_label
         possible_disease = None
         crop_mismatch_note = None
-        rec_data = get_recommendation(prediction.disease)
+        rec_data = get_recommendation(prediction.disease, locale=locale, context=context)
         description = rec_data.get("description", "")
-        recommendation = prediction.recommendation
+        recommendation = rec_data
 
     return PredictionOut(
         id=prediction.id,
@@ -119,4 +111,5 @@ def build_prediction_response(prediction) -> PredictionOut:
         recommendation=recommendation,
         possible_disease=possible_disease,
         crop_mismatch_note=crop_mismatch_note,
+        context=context,
     )

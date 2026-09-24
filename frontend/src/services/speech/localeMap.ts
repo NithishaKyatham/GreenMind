@@ -22,6 +22,19 @@ export const LOCALE_TO_BCP47: Record<string, string> = {
   pa: "pa-IN",
 };
 
+export const LOCALE_NAMES: Record<string, string> = {
+  en: "English",
+  te: "Telugu",
+  hi: "Hindi",
+  ta: "Tamil",
+  kn: "Kannada",
+  mr: "Marathi",
+  ml: "Malayalam",
+  bn: "Bengali",
+  gu: "Gujarati",
+  pa: "Punjabi",
+};
+
 export function toBcp47(locale: string): string {
   return LOCALE_TO_BCP47[locale] || "en-IN";
 }

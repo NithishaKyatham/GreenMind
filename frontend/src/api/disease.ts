@@ -1,15 +1,32 @@
 import { apiClient } from "./client";
 
-export const predictDisease = (crop: string, image: File) => {
+export interface PredictionContextInput {
+  season?: string;
+  region?: string;
+  crop_stage?: string;
+  soil_info?: string;
+}
+
+export const predictDisease = (
+  crop: string,
+  image: File,
+  locale = "en",
+  context: PredictionContextInput = {},
+) => {
   const formData = new FormData();
   formData.append("crop", crop);
+  formData.append("locale", locale);
+  Object.entries(context).forEach(([key, value]) => {
+    if (value?.trim()) formData.append(key, value.trim());
+  });
   formData.append("image", image);
   return apiClient.post("/disease/predict", formData, {
     headers: { "Content-Type": "multipart/form-data" },
   });
 };
 
-export const getPrediction = (id: string) => apiClient.get(`/disease/${id}`);
+export const getPrediction = (id: string, locale = "en") =>
+  apiClient.get(`/disease/${id}`, { params: { locale } });
 
 export const getPredictionImageBlob = (id: string) =>
   apiClient.get(`/disease/${id}/image`, { responseType: "blob" });

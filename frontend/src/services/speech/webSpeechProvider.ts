@@ -1,5 +1,12 @@
 import { SpeechRecognitionService, SpeechErrorInfo, TextToSpeechService } from "./types";
-import { toBcp47 } from "./localeMap";
+import { LOCALE_NAMES, toBcp47 } from "./localeMap";
+import {
+  AvailableVoiceLanguage,
+  findVoiceForLocale,
+  getAvailableVoiceLanguages,
+  getVoiceAvailability,
+  VoiceAvailability,
+} from "./voiceSelection";
 
 // Minimal ambient typings for the Web Speech API, which isn't in the
 // default TS DOM lib. Kept local to this provider rather than a global.d.ts
@@ -104,20 +111,136 @@ export class WebSpeechRecognitionService implements SpeechRecognitionService {
  */
 export class WebSpeechTextToSpeechService implements TextToSpeechService {
   readonly providerName = "browser";
+  private requestId = 0;
+  private pendingTimer: number | null = null;
+  private voicesChangedHandler: (() => void) | null = null;
+  private voicesLoaded = false;
 
   isSupported(): boolean {
     return !!window.speechSynthesis;
   }
 
-  speak(text: string, locale: string): void {
-    if (!window.speechSynthesis) return;
-    window.speechSynthesis.cancel(); // stop any prior utterance
+  getVoiceAvailability(locale: string): VoiceAvailability {
+    const synthesis = window.speechSynthesis;
+    if (!synthesis) return { available: false, loading: false, voice: null };
+    const voices = synthesis.getVoices?.() || [];
+    if (voices.length) this.voicesLoaded = true;
+    return getVoiceAvailability(voices, toBcp47(locale), !this.voicesLoaded);
+  }
+
+  getAvailableVoiceLanguages(): AvailableVoiceLanguage[] {
+    const synthesis = window.speechSynthesis;
+    return synthesis ? getAvailableVoiceLanguages(synthesis.getVoices?.() || []) : [];
+  }
+
+  subscribeVoiceAvailability(listener: () => void): () => void {
+    const synthesis = window.speechSynthesis;
+    if (!synthesis) return () => undefined;
+    const previousHandler = synthesis.onvoiceschanged;
+    const handler = () => {
+      previousHandler?.call(synthesis, new Event("voiceschanged"));
+      this.voicesLoaded = true;
+      listener();
+    };
+    synthesis.onvoiceschanged = handler;
+    return () => {
+      if (synthesis.onvoiceschanged === handler) synthesis.onvoiceschanged = previousHandler;
+    };
+  }
+
+  speak(
+    text: string,
+    locale: string,
+    onEnd?: () => void,
+    onError?: (error: SpeechErrorInfo) => void
+  ): void {
+    const synthesis = window.speechSynthesis;
+    if (!synthesis) return;
+    this.cancel();
+    const requestId = ++this.requestId;
     const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = toBcp47(locale);
-    window.speechSynthesis.speak(utterance);
+    const language = toBcp47(locale);
+    const languageName = LOCALE_NAMES[locale] || language;
+    utterance.lang = language;
+    utterance.onend = onEnd || null;
+    utterance.onerror = onEnd || null;
+
+    const speakWithAvailableVoice = (): boolean => {
+      if (requestId !== this.requestId) return true;
+
+      const voices = synthesis.getVoices?.() || [];
+      if (!voices.length) return false;
+
+      const matchingVoice = findVoiceForLocale(voices, language);
+
+      if (!matchingVoice) {
+        this.cancel();
+        onError?.({
+          code: "language-not-supported",
+          message: `A voice for ${languageName} is not available on this device.`,
+        });
+        return true;
+      }
+      utterance.voice = matchingVoice;
+      synthesis.speak(utterance);
+      return true;
+    };
+
+    // Some browsers populate voices only after voiceschanged fires.
+    const supportsVoiceEvents = "onvoiceschanged" in synthesis;
+    const spokeWithMatchingVoice = speakWithAvailableVoice();
+    if (spokeWithMatchingVoice || !supportsVoiceEvents || !synthesis.getVoices) {
+      if (!spokeWithMatchingVoice) {
+        this.cancel();
+        onError?.({
+          code: "language-not-supported",
+          message: `A voice for ${languageName} is not available on this device.`,
+        });
+      }
+      return;
+    }
+
+    const previousHandler = synthesis.onvoiceschanged;
+    const handleVoicesChanged = () => {
+      previousHandler?.call(synthesis, new Event("voiceschanged"));
+      if (this.pendingTimer !== null) window.clearTimeout(this.pendingTimer);
+      this.pendingTimer = null;
+      synthesis.onvoiceschanged = previousHandler;
+      if (!speakWithAvailableVoice()) {
+        this.cancel();
+        onError?.({
+          code: "language-not-supported",
+          message: `A voice for ${languageName} is not available on this device.`,
+        });
+      }
+    };
+    this.voicesChangedHandler = handleVoicesChanged;
+    synthesis.onvoiceschanged = handleVoicesChanged;
+    this.pendingTimer = window.setTimeout(() => {
+      if (requestId !== this.requestId) return;
+      synthesis.onvoiceschanged = previousHandler;
+      this.voicesChangedHandler = null;
+      this.pendingTimer = null;
+      if (!speakWithAvailableVoice()) {
+        this.cancel();
+        onError?.({
+          code: "language-not-supported",
+          message: `A voice for ${languageName} is not available on this device.`,
+        });
+      }
+    }, 250);
   }
 
   cancel(): void {
+    this.requestId += 1;
+    if (this.pendingTimer !== null) {
+      window.clearTimeout(this.pendingTimer);
+      this.pendingTimer = null;
+    }
+    if (window.speechSynthesis && this.voicesChangedHandler === window.speechSynthesis.onvoiceschanged) {
+      window.speechSynthesis.onvoiceschanged = null;
+    }
+    this.voicesChangedHandler = null;
     window.speechSynthesis?.cancel();
   }
 }

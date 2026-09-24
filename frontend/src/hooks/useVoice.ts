@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { createSpeechRecognitionService, createTextToSpeechService } from "../services/speech";
 import type { SpeechRecognitionService, TextToSpeechService } from "../services/speech";
+import type { AvailableVoiceLanguage } from "../services/speech/voiceSelection";
 
 /**
  * Voice input (speech-to-text) and output (text-to-speech) for GreenMind.
@@ -18,19 +19,41 @@ import type { SpeechRecognitionService, TextToSpeechService } from "../services/
  */
 export function useVoice(locale: string) {
   const [supported, setSupported] = useState(false);
+  const [ttsSupported, setTtsSupported] = useState(false);
   const [listening, setListening] = useState(false);
+  const [speaking, setSpeaking] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [voiceAvailable, setVoiceAvailable] = useState<boolean | null>(null);
+  const [voiceLoading, setVoiceLoading] = useState(false);
+  const [availableVoiceLanguages, setAvailableVoiceLanguages] = useState<AvailableVoiceLanguage[]>([]);
 
   const recognitionServiceRef = useRef<SpeechRecognitionService | null>(null);
   const ttsServiceRef = useRef<TextToSpeechService | null>(null);
 
   useEffect(() => {
     recognitionServiceRef.current = createSpeechRecognitionService();
-    ttsServiceRef.current = createTextToSpeechService();
-    setSupported(
-      recognitionServiceRef.current.isSupported() && ttsServiceRef.current.isSupported()
+    // Recommendation playback is intentionally local and free; it must not
+    // route through the optional cloud TTS providers.
+    ttsServiceRef.current = createTextToSpeechService("browser");
+    const recognitionSupported = recognitionServiceRef.current.isSupported();
+    const textToSpeechSupported = ttsServiceRef.current.isSupported();
+    setSupported(recognitionSupported && textToSpeechSupported);
+    setTtsSupported(textToSpeechSupported);
+    const updateVoiceAvailability = () => {
+      const availability = ttsServiceRef.current?.getVoiceAvailability?.(locale);
+      if (!availability) return;
+      setVoiceAvailable(availability.available);
+      setVoiceLoading(availability.loading);
+      setAvailableVoiceLanguages(
+        ttsServiceRef.current?.getAvailableVoiceLanguages?.() || []
+      );
+    };
+    updateVoiceAvailability();
+    const unsubscribe = ttsServiceRef.current?.subscribeVoiceAvailability?.(
+      updateVoiceAvailability
     );
-  }, []);
+    return unsubscribe;
+  }, [locale]);
 
   const startListening = (onResult: (text: string) => void) => {
     const service = recognitionServiceRef.current;
@@ -58,12 +81,39 @@ export function useVoice(locale: string) {
   };
 
   const speak = (text: string) => {
-    ttsServiceRef.current?.speak(text, locale);
+    const service = ttsServiceRef.current;
+    if (!service || !service.isSupported()) return;
+
+    setError(null);
+    setSpeaking(true);
+    service.speak(
+      text,
+      locale,
+      () => setSpeaking(false),
+      (voiceError) => {
+        setSpeaking(false);
+        setError(voiceError.message);
+      }
+    );
   };
 
   const stopSpeaking = () => {
     ttsServiceRef.current?.cancel();
+    setSpeaking(false);
   };
 
-  return { supported, listening, error, startListening, stopListening, speak, stopSpeaking };
+  return {
+    supported,
+    ttsSupported,
+    voiceAvailable,
+    voiceLoading,
+    availableVoiceLanguages,
+    speaking,
+    listening,
+    error,
+    startListening,
+    stopListening,
+    speak,
+    stopSpeaking,
+  };
 }

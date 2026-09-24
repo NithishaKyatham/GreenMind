@@ -12,12 +12,16 @@ python-dotenv==1.0.1
 Pillow==10.4.0
 numpy==1.26.4
 httpx==0.27.2
+scikit-image==0.24.0
+scikit-learn==1.5.2
+matplotlib==3.9.2
 reportlab==4.2.5
 slowapi==0.1.9
 
 # ML (installed separately in ml/ environment too - see ml/requirements.txt)
 torch==2.4.1
 torchvision==0.19.1
+lime==0.2.0.1
 
 # Testing
 pytest==8.3.3

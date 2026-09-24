@@ -35,13 +35,37 @@ async def fetch_weather(location: str) -> dict:
 
     try:
         async with httpx.AsyncClient(timeout=8.0) as client:
-            current = await client.get(
-                f"{settings.WEATHER_API_BASE_URL}/weather",
+            geocode_url = settings.WEATHER_API_BASE_URL.replace(
+                "/data/2.5", "/geo/1.0/direct"
+            )
+            geo_response = await client.get(
+                geocode_url,
                 params={
                     "q": location,
+                    "limit": 1,
                     "appid": settings.WEATHER_API_KEY,
-                    "units": "metric",
                 },
+            )
+            geo_response.raise_for_status()
+            geo_result = geo_response.json()
+
+            if not geo_result:
+                return _unavailable(
+                    location,
+                    "We could not find that city or town. Please check the location and try again.",
+                )
+
+            coordinates = geo_result[0]
+            weather_params = {
+                "lat": coordinates["lat"],
+                "lon": coordinates["lon"],
+                "appid": settings.WEATHER_API_KEY,
+                "units": "metric",
+            }
+
+            current = await client.get(
+                f"{settings.WEATHER_API_BASE_URL}/weather",
+                params=weather_params,
             )
 
             current.raise_for_status()
@@ -49,11 +73,7 @@ async def fetch_weather(location: str) -> dict:
 
             forecast_resp = await client.get(
                 f"{settings.WEATHER_API_BASE_URL}/forecast",
-                params={
-                    "q": location,
-                    "appid": settings.WEATHER_API_KEY,
-                    "units": "metric",
-                },
+                params=weather_params,
             )
 
             forecast_resp.raise_for_status()
@@ -100,10 +120,7 @@ async def fetch_weather(location: str) -> dict:
 
         return _unavailable(
             location,
-            (
-                "OpenWeather API error: HTTP "
-                f"{e.response.status_code if e.response is not None else 'unknown'}"
-            ),
+            "The weather service is temporarily unavailable. Please try again shortly.",
         )
 
     except httpx.RequestError:

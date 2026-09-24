@@ -18,6 +18,7 @@ class DiseasePrediction(Base):
     confidence = Column(Float, nullable=False)  # 0.0 - 1.0
     severity = Column(String(20), nullable=False)  # Low / Medium / High
     is_fallback_prediction = Column(Boolean, default=False, nullable=False)  # dev-mode flag
+    context_json = Column(String(4000), nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False, index=True)
 
     user = relationship("User", back_populates="predictions")

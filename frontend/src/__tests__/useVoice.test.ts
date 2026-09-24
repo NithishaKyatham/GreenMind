@@ -10,17 +10,19 @@ afterEach(() => {
   (window as any).SpeechRecognition = originalSpeechRecognition;
   (window as any).speechSynthesis = originalSpeechSynthesis;
   (window as any).SpeechSynthesisUtterance = originalUtterance;
+  vi.unstubAllGlobals();
   vi.unstubAllEnvs();
 });
 
 describe("useVoice (post-refactor regression)", () => {
-  it("reports unsupported when the browser has no speech APIs, same as before the refactor", () => {
+  it("reports browser TTS unavailable when browser speech APIs are missing", () => {
     delete (window as any).SpeechRecognition;
     delete (window as any).webkitSpeechRecognition;
     delete (window as any).speechSynthesis;
 
     const { result } = renderHook(() => useVoice("en"));
     expect(result.current.supported).toBe(false);
+    expect(result.current.ttsSupported).toBe(false);
   });
 
   it("reports supported and round-trips a transcript through startListening, same public shape as before", async () => {
@@ -63,12 +65,18 @@ describe("useVoice (post-refactor regression)", () => {
     expect(result.current.listening).toBe(false);
   });
 
-  it("speak() still delegates to speechSynthesis exactly as before", () => {
+  it("uses the installed browser voice for the selected locale", async () => {
     const speak = vi.fn();
     (window as any).SpeechRecognition = vi.fn();
-    (window as any).speechSynthesis = { cancel: vi.fn(), speak };
+    (window as any).speechSynthesis = {
+      cancel: vi.fn(),
+      speak,
+      getVoices: () => [{ lang: "hi-IN", name: "Hindi Voice" }],
+    };
     (window as any).SpeechSynthesisUtterance = function (text: string) {
       (this as any).text = text;
+      (this as any).lang = "";
+      (this as any).voice = null;
     };
 
     const { result } = renderHook(() => useVoice("hi"));
@@ -76,6 +84,20 @@ describe("useVoice (post-refactor regression)", () => {
       result.current.speak("hello farmer");
     });
 
-    expect(speak).toHaveBeenCalled();
+    await waitFor(() => expect(speak).toHaveBeenCalled());
+  });
+
+  it("keeps TTS available when speech recognition is unavailable", async () => {
+    delete (window as any).SpeechRecognition;
+    delete (window as any).webkitSpeechRecognition;
+    (window as any).speechSynthesis = { cancel: vi.fn(), speak: vi.fn() };
+    (window as any).SpeechSynthesisUtterance = function (text: string) {
+      (this as any).text = text;
+    };
+
+    const { result } = renderHook(() => useVoice("en"));
+
+    await waitFor(() => expect(result.current.ttsSupported).toBe(true));
+    expect(result.current.supported).toBe(false);
   });
 });

@@ -172,7 +172,7 @@ export class AzureTextToSpeechService implements TextToSpeechService {
     return !!readAzureConfig(this.config);
   }
 
-  speak(text: string, locale: string): void {
+  speak(text: string, locale: string, onEnd?: () => void): void {
     const azure = readAzureConfig(this.config);
     if (!azure) return; // caller should have checked isSupported() first
 
@@ -203,6 +203,10 @@ export class AzureTextToSpeechService implements TextToSpeechService {
         const url = URL.createObjectURL(blob);
         const audio = new Audio(url);
         this.currentAudio = audio;
+        audio.onended = () => {
+          URL.revokeObjectURL(url);
+          onEnd?.();
+        };
         audio.play().catch(() => {
           /* Autoplay can be blocked by the browser; this is a best-effort
              feature, so failing silently here is acceptable rather than
@@ -210,6 +214,7 @@ export class AzureTextToSpeechService implements TextToSpeechService {
         });
       })
       .catch(() => {
+        onEnd?.();
         /* Same rationale as above — TTS failures degrade to silence, not
            an error banner, since the text is already shown on screen. */
       });

@@ -1,5 +1,6 @@
 import io
 from PIL import Image
+from app.ml.predictor import PredictionResult
 
 
 def _register_and_login(client, email="crop@example.com"):
@@ -78,3 +79,65 @@ def test_crops_endpoint_matches_model_supported_crops(client):
             classes = json.load(f)
         expected_crops = {c.split("___")[0] for c in classes}
         assert returned_names == expected_crops
+
+
+def test_prediction_context_is_returned_and_weather_is_optional(client, monkeypatch):
+    token = _register_and_login(client, email="context@example.com")
+    headers = {"Authorization": f"Bearer {token}"}
+
+    async def fake_weather(location):
+        return {
+            "location": location,
+            "temperature": 28,
+            "humidity": 60,
+            "rainfall": 0,
+            "condition": "clear",
+            "wind_speed": 2,
+            "forecast": [{"rain_probability": 80}],
+            "source": "live",
+        }
+
+    monkeypatch.setattr("app.api.disease.fetch_weather", fake_weather)
+    monkeypatch.setattr(
+        "app.api.disease.predict",
+        lambda image: PredictionResult("Tomato___Early_blight", 0.95, False),
+    )
+    image = _fake_image_bytes()
+    response = client.post(
+        "/api/disease/predict",
+        headers=headers,
+        data={
+            "crop": "Tomato",
+            "season": "Kharif",
+            "region": "Warangal",
+            "crop_stage": "flowering",
+            "soil_info": "clay",
+        },
+        files={"image": ("leaf.jpg", image, "image/jpeg")},
+    )
+    assert response.status_code == 201
+    data = response.json()
+    assert data["context"]["season"] == "Kharif"
+    assert data["context"]["region"] == "Warangal"
+    assert data["context"]["weather"]["source"] == "live"
+    assert "Live weather context" in data["recommendation"]["monitoring_advice"]
+
+
+def test_low_confidence_and_crop_mismatch_remain_safe_with_context(client, monkeypatch):
+    token = _register_and_login(client, email="context-safety@example.com")
+    headers = {"Authorization": f"Bearer {token}"}
+    monkeypatch.setattr(
+        "app.api.disease.predict",
+        lambda image: PredictionResult("Potato___Late_blight", 0.95, False),
+    )
+    image = _fake_image_bytes()
+    response = client.post(
+        "/api/disease/predict",
+        headers=headers,
+        data={"crop": "Tomato", "season": "Kharif"},
+        files={"image": ("leaf.jpg", image, "image/jpeg")},
+    )
+    assert response.status_code == 201
+    data = response.json()
+    assert data["status"] == "low_confidence"
+    assert "unconfirmed diagnosis" in data["recommendation"]["pesticide_guidance"]

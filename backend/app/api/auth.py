@@ -8,7 +8,7 @@ from app.core.database import get_db
 from app.core.security import verify_password, create_access_token, create_refresh_token, decode_token
 from app.core.deps import get_current_user
 from app.models.user import User
-from app.repositories.user_repository import get_user_by_email, create_user
+from app.repositories.user_repository import get_user_by_email, get_user_by_id, create_user
 from app.schemas.user import UserCreate, UserLogin, UserOut, Token
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])

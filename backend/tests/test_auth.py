@@ -41,6 +41,27 @@ def test_login_success_and_failure(client):
     assert bad.status_code == 401
 
 
+def test_refresh_token_returns_new_tokens(client):
+    client.post(
+        "/api/auth/register",
+        json={"name": "Refresh User", "email": "refresh@example.com", "password": "SecurePass123"},
+    )
+    login = client.post(
+        "/api/auth/login",
+        json={"email": "refresh@example.com", "password": "SecurePass123"},
+    )
+    refresh_token = login.json()["refresh_token"]
+
+    response = client.post(
+        "/api/auth/refresh",
+        params={"refresh_token": refresh_token},
+    )
+
+    assert response.status_code == 200
+    assert response.json()["access_token"]
+    assert response.json()["refresh_token"]
+
+
 def test_me_requires_auth_token(client):
     unauthenticated = client.get("/api/auth/me")
     assert unauthenticated.status_code == 401
