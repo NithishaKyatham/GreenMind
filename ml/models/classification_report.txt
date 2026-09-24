@@ -1,0 +1,244 @@
+GREENMIND TEST SET EVALUATION
+===========================================================================
+
+Test images: 8179
+Classes: 38
+
+Test Accuracy       : 0.9961 (99.61%)
+Macro Precision     : 0.9945
+Macro Recall        : 0.9944
+Macro F1            : 0.9944
+Weighted Precision  : 0.9961
+Weighted Recall     : 0.9961
+Weighted F1         : 0.9961
+
+PER-CLASS RESULTS
+---------------------------------------------------------------------------
+
+Apple___Apple_scab
+  Precision: 1.0000
+  Recall:    0.9895
+  F1:        0.9947
+  Support:   95
+
+Apple___Black_rot
+  Precision: 1.0000
+  Recall:    0.9681
+  F1:        0.9838
+  Support:   94
+
+Apple___Cedar_apple_rust
+  Precision: 1.0000
+  Recall:    1.0000
+  F1:        1.0000
+  Support:   42
+
+Apple___healthy
+  Precision: 1.0000
+  Recall:    1.0000
+  F1:        1.0000
+  Support:   248
+
+Blueberry___healthy
+  Precision: 0.9912
+  Recall:    1.0000
+  F1:        0.9956
+  Support:   226
+
+Cherry_(including_sour)___Powdery_mildew
+  Precision: 1.0000
+  Recall:    1.0000
+  F1:        1.0000
+  Support:   159
+
+Cherry_(including_sour)___healthy
+  Precision: 1.0000
+  Recall:    0.9845
+  F1:        0.9922
+  Support:   129
+
+Corn_(maize)___Cercospora_leaf_spot Gray_leaf_spot
+  Precision: 0.9605
+  Recall:    0.9359
+  F1:        0.9481
+  Support:   78
+
+Corn_(maize)___Common_rust_
+  Precision: 1.0000
+  Recall:    1.0000
+  F1:        1.0000
+  Support:   180
+
+Corn_(maize)___Northern_Leaf_Blight
+  Precision: 0.9669
+  Recall:    0.9799
+  F1:        0.9733
+  Support:   149
+
+Corn_(maize)___healthy
+  Precision: 0.9943
+  Recall:    1.0000
+  F1:        0.9972
+  Support:   175
+
+Grape___Black_rot
+  Precision: 0.9944
+  Recall:    1.0000
+  F1:        0.9972
+  Support:   177
+
+Grape___Esca_(Black_Measles)
+  Precision: 1.0000
+  Recall:    0.9952
+  F1:        0.9976
+  Support:   208
+
+Grape___Leaf_blight_(Isariopsis_Leaf_Spot)
+  Precision: 1.0000
+  Recall:    1.0000
+  F1:        1.0000
+  Support:   162
+
+Grape___healthy
+  Precision: 1.0000
+  Recall:    1.0000
+  F1:        1.0000
+  Support:   64
+
+Orange___Haunglongbing_(Citrus_greening)
+  Precision: 1.0000
+  Recall:    1.0000
+  F1:        1.0000
+  Support:   827
+
+Peach___Bacterial_spot
+  Precision: 0.9971
+  Recall:    0.9971
+  F1:        0.9971
+  Support:   346
+
+Peach___healthy
+  Precision: 0.9821
+  Recall:    1.0000
+  F1:        0.9910
+  Support:   55
+
+Pepper,_bell___Bacterial_spot
+  Precision: 0.9742
+  Recall:    1.0000
+  F1:        0.9869
+  Support:   151
+
+Pepper,_bell___healthy
+  Precision: 0.9911
+  Recall:    1.0000
+  F1:        0.9955
+  Support:   223
+
+Potato___Early_blight
+  Precision: 0.9934
+  Recall:    1.0000
+  F1:        0.9967
+  Support:   150
+
+Potato___Late_blight
+  Precision: 1.0000
+  Recall:    0.9933
+  F1:        0.9967
+  Support:   150
+
+Potato___healthy
+  Precision: 1.0000
+  Recall:    1.0000
+  F1:        1.0000
+  Support:   24
+
+Raspberry___healthy
+  Precision: 1.0000
+  Recall:    1.0000
+  F1:        1.0000
+  Support:   57
+
+Soybean___healthy
+  Precision: 1.0000
+  Recall:    0.9987
+  F1:        0.9993
+  Support:   764
+
+Squash___Powdery_mildew
+  Precision: 1.0000
+  Recall:    1.0000
+  F1:        1.0000
+  Support:   276
+
+Strawberry___Leaf_scorch
+  Precision: 1.0000
+  Recall:    1.0000
+  F1:        1.0000
+  Support:   167
+
+Strawberry___healthy
+  Precision: 1.0000
+  Recall:    1.0000
+  F1:        1.0000
+  Support:   69
+
+Tomato___Bacterial_spot
+  Precision: 0.9907
+  Recall:    0.9938
+  F1:        0.9922
+  Support:   320
+
+Tomato___Early_blight
+  Precision: 0.9932
+  Recall:    0.9733
+  F1:        0.9832
+  Support:   150
+
+Tomato___Late_blight
+  Precision: 0.9965
+  Recall:    0.9895
+  F1:        0.9930
+  Support:   287
+
+Tomato___Leaf_Mold
+  Precision: 1.0000
+  Recall:    1.0000
+  F1:        1.0000
+  Support:   144
+
+Tomato___Septoria_leaf_spot
+  Precision: 1.0000
+  Recall:    1.0000
+  F1:        1.0000
+  Support:   267
+
+Tomato___Spider_mites Two-spotted_spider_mite
+  Precision: 0.9960
+  Recall:    1.0000
+  F1:        0.9980
+  Support:   252
+
+Tomato___Target_Spot
+  Precision: 0.9906
+  Recall:    0.9953
+  F1:        0.9929
+  Support:   212
+
+Tomato___Tomato_Yellow_Leaf_Curl_Virus
+  Precision: 0.9988
+  Recall:    0.9950
+  F1:        0.9969
+  Support:   805
+
+Tomato___Tomato_mosaic_virus
+  Precision: 0.9828
+  Recall:    1.0000
+  F1:        0.9913
+  Support:   57
+
+Tomato___healthy
+  Precision: 0.9959
+  Recall:    1.0000
+  F1:        0.9979
+  Support:   240
