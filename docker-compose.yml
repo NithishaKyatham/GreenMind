@@ -1,0 +1,71 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: greenmind_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: greenmind_user
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+      POSTGRES_DB: greenmind_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - greenmind_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U greenmind_user -d greenmind_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: greenmind_backend
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgresql+psycopg2://greenmind_user:${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}@db:5432/greenmind_db
+      USE_SQLITE: "false"
+      # Absolute paths inside the container — override the relative dev
+      # defaults in .env, which assume `cwd == backend/` on the host and
+      # would resolve incorrectly against the container's /app WORKDIR.
+      MODEL_PATH: /app/ml_models/crop_disease_model.pt
+      UPLOAD_DIR: /app/uploads
+      REPORTS_DIR: /app/reports
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+      - ./ml/models:/app/ml_models:ro
+      - greenmind_uploads:/app/uploads
+      - greenmind_reports:/app/reports
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: greenmind_frontend
+    restart: unless-stopped
+    environment:
+      VITE_API_BASE_URL: http://localhost:8000/api
+    depends_on:
+      - backend
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    command: npm run dev -- --host 0.0.0.0
+
+volumes:
+  greenmind_pgdata:
+  greenmind_uploads:
+  greenmind_reports:

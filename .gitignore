@@ -1,0 +1,75 @@
+# Environments
+.env
+.env.local
+*.env
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+
+# Node
+node_modules/
+dist/
+build/
+.vite/
+
+# ML
+ml/dataset/raw/
+ml/dataset/processed/
+ml/models/*.pth
+ml/models/*.h5
+ml/models/*.onnx
+!ml/models/.gitkeep
+
+# Uploaded images (runtime data)
+backend/uploads/
+backend/app/uploads/
+
+# Reports
+backend/reports/*.pdf
+!backend/reports/.gitkeep
+
+# DB
+*.sqlite3
+*.db
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+
+# Logs
+*.log
+logs/
+
+# Docker
+*.override.yml
+
+# PyTorch model
+ml/models/*.pt
+
+# TypeScript build cache
+*.tsbuildinfo
+# Generated files
+uploads/*
+reports/*
+
+# Local backup
+backend_backup_before_agent/
+
+# Environment files
+.env
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Node
+node_modules/
+frontend/dist/
